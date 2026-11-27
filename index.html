@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F4A2A">
+<link rel="manifest" href="manifest.json">
+<title>GAYNAKO AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<style>
+:root{--g1:#0F4A2A;--g2:#2E8B47;--bg:#F7F4EA;--card:#fff;--tx:#14211a;--bd:#dcd8c4;--gr:#5c6b61;--sun:#F2B01E;--ter:#A8512E;--ind:#2B4C7E;box-sizing:border-box}
+:root[data-theme=dark]{--bg:#0d1912;--card:#15261b;--tx:#eef2e6;--bd:#2a4333;--gr:#a3b3a8}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1912;--card:#15261b;--tx:#eef2e6;--bd:#2a4333;--gr:#a3b3a8}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--g1);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 12px}
+header b{flex:1;font-size:18px;letter-spacing:.04em}
+nav{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--bd)}
+nav button{flex:none;border:0;background:transparent;color:var(--tx);padding:10px 14px;border-radius:999px;font-size:16px;cursor:pointer}
+nav button.on{background:var(--g1);color:#fff;font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+main{max-width:1000px;margin:auto;padding:14px}
+section{display:none}section.on{display:block}
+.hero{background:var(--g1);color:#fff;border-radius:24px;padding:30px 20px 22px;position:relative;overflow:hidden}
+.hero svg{position:absolute;inset:0;width:100%;height:100%}
+.hero>*:not(svg){position:relative}
+.hero h1{margin:0;font-size:clamp(38px,11vw,72px);letter-spacing:.02em;line-height:1}
+.hero p{margin:8px 0 0;color:var(--sun);font-weight:600;max-width:30ch}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.tile{border:0;border-radius:18px;background:var(--card);color:var(--tx);border:2px solid var(--bd);padding:16px 10px;font-size:17px;font-weight:600;cursor:pointer}
+.tile span{display:block;font-size:40px;line-height:1.2}
+.tile.sun{background:var(--sun);color:#1b1b1b;border-color:var(--sun)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:0}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-size:17px;font-weight:600;cursor:pointer;background:var(--sun);color:#1b1b1b;margin:6px 0}
+.btn.g{background:var(--g2);color:#fff}.btn.o{background:transparent;border:2px solid var(--g2);color:var(--tx)}.btn.s{width:auto;display:inline-block;padding:8px 12px;font-size:15px;margin:4px 4px 0 0}
+h2{color:var(--g2);margin:10px 0}h3{margin:6px 0}
+input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;margin:4px 0 8px}
+.bar{height:10px;background:var(--bd);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g2)}
+.tag{display:inline-block;font-size:13px;border-radius:8px;padding:2px 8px;font-weight:700;background:var(--sun);color:#222}
+.tag.v{background:var(--g2);color:#fff}.tag.n{background:var(--bd);color:var(--tx)}.tag.c{background:var(--ter);color:#fff}
+.warn{border-left:5px solid var(--sun);background:var(--card);padding:10px 12px;border-radius:10px;margin:8px 0}
+.err{border-left-color:#c0392b}.ok{border-left-color:var(--g2)}
+.kpi{font-size:30px;font-weight:800;color:var(--g2)}
+details.card summary{cursor:pointer;font-weight:700}
+.mic{width:96px;height:96px;border-radius:50%;border:0;background:var(--g2);color:#fff;font-size:42px;cursor:pointer;display:block;margin:10px auto}.mic.rec{background:#c0392b}
+#lmap{height:430px;border-radius:14px;z-index:0;margin:8px 0}
+#wl{position:fixed;inset:0;z-index:20;background:var(--g1);color:#fff;display:none;flex-direction:column;justify-content:center;padding:24px;gap:10px}
+#wl h1{margin:0;font-size:40px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--g1);color:#fff;padding:12px 18px;border-radius:12px;display:none;z-index:30;max-width:90%}
+#pv{max-width:100%;border-radius:12px;margin-top:8px}
+@media print{header,nav,.noprint{display:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+:root{--gold:#C9A24B}
+header{background:linear-gradient(135deg,#0A3A20,#0F4A2A 60%,#17603a);border-bottom:2px solid var(--gold)}
+.hero{background:radial-gradient(120% 90% at 90% 0,#1d6b3d,#0F4A2A 60%);border:1px solid var(--gold)}
+.card{box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px -10px rgba(15,74,42,.35)}
+.tile{transition:transform .15s}.tile:active{transform:scale(.97)}
+h2{color:var(--g1)}:root[data-theme=dark] h2{color:var(--gold)}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap}.thumbs img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--bd)}
+.ov{position:relative;display:inline-block;max-width:100%}.ov img{display:block;max-width:100%;border-radius:12px}.ov i{position:absolute;border:3px solid #e74c3c;border-radius:6px;box-shadow:0 0 0 1px #fff}
+.st{font-weight:800;font-size:18px}
+[hidden]{display:none!important}
+a.btn{text-decoration:none;text-align:center}
+summary{cursor:pointer;font-weight:700}
+</style>
+<style>
+#v2{text-align:center}#v2 select,#chat,#heard{text-align:left}
+#v2 label{display:flex;align-items:center;gap:10px;text-align:left;margin:8px 0}#v2 label input{width:22px;height:22px;margin:0;flex:none}
+#v2-orb{display:flex;align-items:center;justify-content:center;gap:5px;height:56px}
+#v2-orb i{width:10px;height:10px;border-radius:9px;background:var(--bd);transition:background .2s}
+#v2-orb[data-s=listen] i{background:#c0392b;animation:v2l 1s ease-in-out infinite}
+#v2-orb[data-s=think] i{background:var(--sun);animation:v2t .9s ease-in-out infinite}
+#v2-orb[data-s=speak] i{background:var(--g2);height:36px;animation:v2s .7s ease-in-out infinite}
+#v2-orb i:nth-child(2){animation-delay:.1s!important}#v2-orb i:nth-child(3){animation-delay:.2s!important}#v2-orb i:nth-child(4){animation-delay:.3s!important}#v2-orb i:nth-child(5){animation-delay:.4s!important}
+@keyframes v2l{50%{transform:scale(1.9);opacity:.5}}@keyframes v2t{50%{transform:translateY(-16px)}}@keyframes v2s{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+#v2-state{font-weight:800;letter-spacing:.08em;min-height:26px}
+.v2-ctl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.v2-ctl .btn{padding:12px 4px;font-size:15px}.v2-ctl .btn:disabled{opacity:.45;cursor:default}
+@media(prefers-reduced-motion:reduce){#v2-orb i{animation:none!important}}
+#v2-info:empty,#v2-state:empty{display:none}
+</style>
+</head>
+<body>
+<div id="wl" role="dialog" aria-label="Choix de la langue">
+<h1>GAYNAKO AI</h1><p>Choisissez votre langue · Tànnal sa làkk · Xetal ngiin</p>
+<button class="btn" onclick="setLang('fr')">🇸🇳 Français</button>
+<button class="btn" onclick="setLang('wo')">🇸🇳 Wolof (à valider)</button>
+<button class="btn" onclick="setLang('srr')">🇸🇳 Sérère (en attente de validation)</button>
+</div>
+<header><b>🌱 GAYNAKO AI</b><span id="net" class="tag"></span><button class="btn o" style="width:auto;margin:0;padding:6px 12px;color:#fff;border-color:#fff" onclick="theme()" aria-label="Mode clair ou sombre">◐</button></header>
+<nav id="nav"></nav>
+<main>
+
+<section id="accueil" class="on">
+<div class="hero"><svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><circle cx="335" cy="48" r="30" fill="#F2B01E"/><g fill="none" stroke="#2E8B47" stroke-width="3" opacity=".7"><path d="M-10 200Q150 120 410 150"/><path d="M-10 175Q150 100 410 125"/><path d="M-10 150Q150 82 410 100"/><path d="M-10 128Q150 66 410 78"/></g></svg>
+<h1>GAYNAKO AI</h1><p>L’intelligence artificielle au service du monde rural sénégalais.</p></div>
+<div class="tiles">
+<button class="tile sun" onclick="go('diag')"><span>📷</span>Ma plante</button>
+<button class="tile" onclick="go('villages')"><span>🏘️</span>Mon village</button>
+<button class="tile" onclick="go('voix')"><span>🎤</span>Parler</button>
+<button class="tile" onclick="go('froid')"><span>❄️</span>Froid</button>
+<button class="tile" onclick="go('machines')"><span>🚜</span>Machines</button>
+<button class="tile" onclick="go('carte')"><span>🗺️</span>Carte</button>
+<button class="tile" onclick="go('img')"><span>🖼️</span>Images IA</button>
+<button class="tile" onclick="go('compte')"><span>🔐</span>Mon compte</button></div>
+<div class="card" style="margin:12px 0"><h3>🔎 Trouver mon village</h3><input id="h-q" type="search" placeholder="Nom de mon village" onkeydown="if(event.key==='Enter')findHome()"><button class="btn g" onclick="findHome()">Chercher mon village</button><p id="h-cov" style="font-size:14px;margin:6px 0 0"></p></div>
+<div class="grid" id="hk"></div>
+<div class="card" style="margin-top:12px"><h3>🌦️ Météo réelle à ma position</h3><p>Source : Open-Meteo (données réelles, aucune clé requise).</p><button class="btn g" onclick="wx()">Afficher la météo</button><div id="wx"></div></div>
+<div class="card" style="margin-top:12px"><h3>État de cette version</h3>
+<p>✅ Répertoire des localités de Kaolack : import ANSD (CSV/JSON), recherche, fiches, carte, contrôle d’exhaustivité. La base reste vide tant que le fichier officiel n’est pas importé.<br>✅ Réservations de chambres froides et de machines, partage des coûts.<br>✅ Fonctionne sans Internet (données gardées sur le téléphone).<br>⚠️ Diagnostic IA : état du moteur affiché dans l’onglet Diagnostic ; aucun diagnostic n’est simulé.<br>⚠️ Wolof : phrases à faire valider. Sérère : en attente de locuteurs natifs.<br>⚠️ Chambres froides et machines : <span class="tag">DÉMONSTRATION</span>. Villages : aucun avant import du répertoire officiel.</p></div>
+</section>
+
+<section id="villages">
+<h2>Villages de la région de Kaolack</h2>
+<div class="card"><input id="v-q" type="search" placeholder="🔍 Nom du village (accents et variantes acceptés)" oninput="vlist(true)">
+<select id="v-d" onchange="fillAR();vlist(true)"></select>
+<select id="v-a" onchange="fillCM();vlist(true)"></select>
+<select id="v-c" onchange="vlist(true)"></select>
+<select id="v-s" onchange="vlist(true)"><option value="">Tous les statuts</option><option>Vérifiée</option><option>À confirmer</option><option>Non disponible</option></select>
+<div id="v-stat" class="warn"></div></div>
+<div id="v-out" style="margin-top:12px"></div>
+<button id="v-more" class="btn o" style="display:none" onclick="VL+=50;vlist()">Afficher plus</button>
+<details class="card" style="margin-top:12px"><summary>🏛️ Organisation administrative (département → arrondissement → commune)</summary><div id="v-hier"></div></details>
+</section>
+
+<section id="diag">
+<h2>Diagnostic des plantes</h2>
+<div class="warn err" id="eng"><b>Moteur IA non connecté.</b> Cette page vérifie seulement la qualité de la photo et la garde en attente. Un résultat sera toujours un « problème possible », avec un niveau de confiance. Toute application de produit phytosanitaire doit suivre l’étiquette et l’avis d’un agent agricole.</div>
+<div class="card">
+<label for="culture">Culture</label><select id="culture"></select>
+<label for="organe">Partie photographiée</label><select id="organe"><option>Feuille</option><option>Tige</option><option>Fruit</option><option>Racine</option><option>Plante entière</option></select>
+<label for="d-vil">Village / parcelle</label><input id="d-vil" placeholder="Village">
+<label for="d-sym">Symptômes observés</label><textarea id="d-sym" rows="2" placeholder="Ex. feuilles jaunes depuis 5 jours"></textarea>
+<button class="btn g" onclick="$('ph-cam').click()">📷 Prendre une photo</button><button class="btn o" onclick="$('ph-gal').click()">🖼️ Galerie (plusieurs photos)</button>
+<input id="ph-cam" type="file" accept="image/*" capture="environment" hidden><input id="ph-gal" type="file" accept="image/*" multiple hidden>
+<div id="thumbs" class="thumbs"></div>
+<button class="btn" style="font-size:20px;padding:18px" onclick="analyse()">🔍 ANALYSER MA PLANTE</button>
+<div id="prog" style="display:none"><div class="bar"><i id="pb" style="width:0"></i></div><small id="pt"></small></div>
+<div id="res"></div></div>
+<div class="card" style="margin-top:12px"><b>Photos en attente de synchronisation</b><div id="queue"></div></div>
+</section>
+
+<section id="img">
+<h2>Images par IA</h2>
+<div class="warn">Images <b>illustratives</b> générées par IA gratuite (compte requis). Ce ne sont pas des photos réelles et elles ne servent <b>jamais</b> à diagnostiquer une maladie : pour cela, utilisez l’onglet Diagnostic avec une vraie photo.</div>
+<div class="card">
+<label for="i-kind">Que voulez-vous créer ?</label>
+<select id="i-kind">
+<option value="saine">🌱 Plante saine (fiche pédagogique)</option>
+<option value="symp">🍂 Illustration d’un symptôme (indicatif)</option>
+<option value="affiche">📢 Affiche de sensibilisation</option>
+<option value="parcelle">🌾 Parcelle / paysage agricole</option>
+<option value="marche">🧺 Produits au marché</option>
+<option value="libre">✏️ Description libre</option>
+</select>
+<label for="i-cult">Culture</label><select id="i-cult"></select>
+<label for="i-p">Précisions (symptôme, thème, ou description libre)</label>
+<textarea id="i-p" rows="3" maxlength="300" placeholder="Ex. feuilles jaunes avec taches brunes"></textarea>
+<label for="i-fmt">Format</label>
+<select id="i-fmt"><option value="carre">Carré</option><option value="paysage">Paysage</option><option value="portrait">Portrait</option></select>
+<button class="btn g" style="font-size:19px;padding:16px" onclick="genImg()">🎨 GÉNÉRER L’IMAGE</button>
+<div id="i-out"></div></div>
+<div class="card" style="margin-top:12px"><b>Mes dernières images</b> <small>(gardées sur ce téléphone)</small><div id="i-gal" class="thumbs" style="margin-top:8px"></div></div>
+</section>
+
+<section id="sol"><h2>Diagnostic du sol</h2>
+<div class="warn">Saisissez les résultats d’un laboratoire. Une photo ne permet pas de mesurer le sol : aucune mesure n’est déduite d’une image.</div>
+<div class="card"><select id="s-cu"></select>
+<input id="s-ph" type="number" step="0.1" placeholder="pH"><input id="s-ce" type="number" step="0.01" placeholder="Conductivité électrique (dS/m)">
+<select id="s-cm"><option value="">Méthode de la CE ?</option><option value="sat">Pâte saturée (CEe)</option><option value="15">Extrait 1:5</option><option value="autre">Autre / inconnue</option></select>
+<input id="s-mo" type="number" step="0.1" placeholder="Matière organique (%)"><input id="s-n" placeholder="Azote (valeur et unité)"><input id="s-p" placeholder="Phosphore (valeur, unité, méthode)"><input id="s-k" placeholder="Potassium (valeur et unité)">
+<select id="s-tx"><option value="">Texture</option><option>Sableuse</option><option>Sablo-limoneuse</option><option>Limoneuse</option><option>Argileuse</option><option>Argilo-limoneuse</option></select>
+<input id="s-lm" placeholder="Laboratoire / méthodes (facultatif)">
+<button class="btn g" onclick="soil()">Interpréter</button><div id="s-res"></div></div></section>
+<section id="eco"><h2>Décisions économiques</h2>
+<div class="warn">Calcul à partir de VOS chiffres. Rien n’est garanti : le rendement et les prix sont des hypothèses que vous saisissez.</div>
+<div class="card"><input id="e-ha" type="number" step="0.1" placeholder="Superficie (ha)"><input id="e-sk" type="number" placeholder="Semences (kg/ha)"><input id="e-sp" type="number" placeholder="Prix semences (FCFA/kg)">
+<input id="e-ek" type="number" placeholder="Engrais (kg/ha)"><input id="e-ep" type="number" placeholder="Prix engrais (FCFA/kg)"><input id="e-mo" type="number" placeholder="Main-d’œuvre (FCFA)"><input id="e-au" type="number" placeholder="Autres coûts : eau, location… (FCFA)">
+<input id="e-rd" type="number" placeholder="Rendement espéré (kg/ha)"><input id="e-pv" type="number" placeholder="Prix de vente (FCFA/kg)"><button class="btn g" onclick="eco()">Calculer</button><div id="e-res"></div></div>
+<div class="card" style="margin-top:12px"><h3>Suivi des dépenses</h3><input id="d-l" placeholder="Dépense (ex. engrais)"><input id="d-m" type="number" placeholder="Montant (FCFA)"><button class="btn g" onclick="addDep()">Ajouter</button><div id="d-out"></div></div></section>
+<section id="froid">
+<h2>Chambres froides <span class="tag">DÉMONSTRATION</span></h2>
+<div class="grid" id="rooms"></div>
+<div class="card" style="margin-top:12px"><h3>Réserver</h3>
+<div id="r-who"></div>
+<select id="r-room"></select><div id="r-info"></div>
+<select id="r-cat"><option>Fruits</option><option>Légumes</option><option>Produits maraîchers</option><option>Autres produits réfrigérables</option></select>
+<input id="r-kg" type="number" min="1" placeholder="Quantité (kg)"><input id="r-date" type="date"><input id="r-days" type="number" min="1" placeholder="Durée (jours)">
+<button class="btn g" onclick="bookRoom()">Envoyer ma demande de réservation</button></div>
+<div id="r-rec"></div><div id="r-wave"></div>
+<div class="card" style="margin-top:12px"><b>Mes demandes</b><div id="r-hist"></div></div>
+</section>
+
+<section id="machines">
+<h2>Machines partagées <span class="tag">DÉMONSTRATION</span></h2>
+<div class="grid" id="mlist"></div>
+<div class="card" style="margin-top:12px"><h3>Réserver et partager les coûts</h3>
+<div id="m-who"></div>
+<select id="m-sel"></select><div id="m-info"></div><input id="m-date" type="date"><input id="m-days" type="number" min="1" value="1"><input id="m-n" type="number" min="1" value="1" aria-label="Producteurs qui partagent">
+<div id="m-cost" class="warn ok"></div>
+<button class="btn g" onclick="bookM()">Envoyer ma demande de réservation</button></div>
+<div id="m-rec"></div><div id="m-wave"></div>
+<div class="card" style="margin-top:12px"><b>Mes demandes</b><div id="m-hist"></div></div>
+</section>
+
+<section id="carte">
+<h2>Carte agricole de la région de Kaolack</h2>
+<div class="card">
+<input id="f-q" type="search" placeholder="🔍 Trouver un village sur la carte" onkeydown="if(event.key==='Enter')mapFind()"><button class="btn s g" onclick="mapFind()">Chercher</button>
+<select id="f-d" onchange="mapFill();map()"></select>
+<select id="f-a" onchange="mapFill(1);map()"></select>
+<select id="f-c" onchange="map()"></select>
+<label><input type="checkbox" class="f" value="vil" checked onchange="map()" style="width:auto"> 🏘️ Villages géolocalisés</label><br>
+<label><input type="checkbox" class="f" value="lim" checked onchange="map()" style="width:auto"> 🗺️ Limites et zones (GeoJSON importé)</label><br>
+<label><input type="checkbox" class="f" value="froid" checked onchange="map()" style="width:auto"> ❄️ Chambres froides (démo)</label><br>
+<label><input type="checkbox" class="f" value="machine" checked onchange="map()" style="width:auto"> 🚜 Machines (démo)</label>
+<div id="lmap"></div>
+<div id="leg" class="warn"></div>
+<button class="btn o" onclick="locate()">📍 Ma position</button>
+<div class="warn">Touchez un marqueur puis « Ouvrir la fiche ». Fond OpenStreetMap : connexion requise.</div></div>
+</section>
+
+<section id="compte">
+<h2>Mon compte client</h2>
+<div id="acc-msg" class="warn err" hidden role="alert"></div>
+<div id="acc-out"></div>
+<div class="warn">Besoin d’aide ? Appelez ou écrivez sur WhatsApp au <b>77 579 76 29</b>. Votre compte et vos réservations sont enregistrés en ligne : retrouvez-les sur tous vos appareils.</div>
+</section>
+
+<section id="moi">
+<h2>Mon espace producteur</h2>
+<div class="warn">Profil gardé sur ce téléphone seulement. Les comptes sécurisés et la synchronisation demandent le serveur (voir README).</div>
+<div class="card"><input id="p-nom" placeholder="Nom et prénom"><input id="p-tel" type="tel" placeholder="Téléphone"><select id="p-d"></select><input id="p-vil" placeholder="Village"><select id="p-l"><option value="fr">Français</option><option value="wo">Wolof</option><option value="srr">Sérère</option></select><input id="p-cul" placeholder="Cultures (ex. arachide, mil)"><input id="p-sup" type="number" min="0" step="0.1" placeholder="Superficie (ha)"><input id="p-eq" placeholder="Équipements disponibles"><input id="p-bes" placeholder="Besoins"><button class="btn g" onclick="saveP()">Enregistrer</button></div>
+</section>
+
+<section id="voix">
+<h2>Assistant vocal</h2>
+<div class="card">
+<select id="lang" onchange="setLang(this.value)"><option value="fr">🇸🇳 Français</option><option value="wo">🇸🇳 Wolof</option><option value="srr">🇸🇳 Sérère</option></select>
+<button class="mic" id="mic" onclick="listen()" aria-label="Parler">🎤</button>
+<div id="v2" hidden>
+<div id="v2-orb" data-s="idle" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+<div id="v2-state" role="status" aria-live="polite"></div>
+<div class="v2-ctl"><button type="button" class="btn o" id="v2-rep" onclick="v2Repeat()" disabled>🔁 Répéter</button><button type="button" class="btn o" id="v2-pau" onclick="v2Pause()" disabled>⏸️ Pause</button><button type="button" class="btn o" id="v2-stop" onclick="v2Stop()">⏹️ Arrêter</button></div>
+<label for="v2-prov" style="margin-bottom:0">Moteur IA</label><select id="v2-prov"><option value="auto">Automatique (recommandé)</option><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+<label><input type="checkbox" id="v2-conv"> Mode conversation : le micro se rouvre après la réponse</label>
+<label><input type="checkbox" id="v2-auto" checked> Répondre dans la langue détectée</label>
+<label><input type="checkbox" id="v2-save"> Enregistrer mes conversations (texte seulement, jamais l’audio)</label>
+<div class="warn" id="v2-info" style="text-align:left"></div>
+<details class="card" id="v2-hist" style="text-align:left" ontoggle="if(this.open)v2History()"><summary>🕘 Mon historique</summary><div id="v2-hlist"></div><button type="button" class="btn s o" onclick="v2Delete()">Supprimer tout mon historique</button></details>
+</div>
+<div id="heard" class="warn">Appuyez sur le micro et dites : diagnostic, froid, machine, carte.</div>
+<button class="btn g" onclick="say('hello')">🔊 Écouter l’accueil</button>
+<button class="btn o" onclick="say('photo')">🔊 Écouter : prendre une photo</button>
+<div id="linfo" class="warn"></div>
+<h3>Poser une question à l’IA</h3><div id="chat"></div><textarea id="q-in" rows="2" placeholder="Ex. pourquoi mes feuilles de tomate jaunissent-elles ?"></textarea>
+<button class="btn g" onclick="ask()">Envoyer</button><button class="btn o" onclick="window.v2ReadLast?v2ReadLast():speakTxt((CH.filter(m=>m.r==='a').pop()||{}).t)">🔊 Lire la dernière réponse</button><div class="warn" id="chat-st">Réponses générées par IA, compte requis. À confirmer avec un agent agricole.</div></div>
+</section>
+
+<section id="admin">
+<h2>Administration</h2>
+<div id="adm-gate"></div>
+<div id="adm-body" hidden>
+<button class="btn o" onclick="admLock()">🔒 Se déconnecter de l’administration</button>
+<div class="card"><h3>📋 Réservations des clients</h3><div class="grid" id="ad-kpi"></div>
+<input id="ad-q" type="search" placeholder="🔍 Nom, téléphone, e-mail ou N° de réservation" oninput="ADN=20;renderAdm()">
+<select id="ad-s" onchange="ADN=20;renderAdm()"><option value="">Tous les statuts</option><option>En attente</option><option>Confirmée</option><option>Refusée</option><option>Annulée</option><option>Terminée</option></select>
+<div id="ad-list"></div><button id="ad-more" class="btn o" style="display:none" onclick="ADN+=20;renderAdm()">Afficher plus</button>
+<button class="btn o noprint" onclick="csvBk()">📥 Réservations clients (CSV complet)</button></div>
+<div class="card" style="margin-top:12px"><h3>👥 Clients inscrits</h3><input id="ad-cq" type="search" placeholder="🔍 Nom, téléphone ou e-mail" oninput="CLN=20;renderCl()"><div id="ad-cl"></div><button id="ad-cmore" class="btn o" style="display:none" onclick="CLN+=20;renderCl()">Afficher plus</button></div>
+<div class="card" style="margin-top:12px"><h3>🔔 Notifications administrateur</h3><div id="ad-nt"></div></div>
+<div class="card" style="margin-top:12px"><h3>☁️ Répertoire partagé (Supabase)</h3><div id="v-sync" class="warn"></div><button class="btn g" onclick="syncVil()">Synchroniser maintenant</button></div>
+<div id="old-data" class="warn" hidden>Des comptes ou réservations créés avant la mise en ligne sont encore sur ce téléphone.<button class="btn o" onclick="csvOld()">📥 Exporter ces anciennes données</button></div>
+<div class="grid" id="kpis" style="margin-top:12px"></div>
+<div class="card" style="margin-top:12px"><b>Villages par département</b><div id="ch1"></div></div>
+<div class="card" style="margin-top:12px"><b>Stock en chambres froides, tonnes</b> <span class="tag">DÉMONSTRATION</span><div id="ch2"></div></div>
+<div class="card" style="margin-top:12px"><h3>🔍 Contrôle d’exhaustivité</h3><div id="verdict"></div><div id="ctl"></div></div>
+<div class="card" style="margin-top:12px"><h3>📝 Corrections signalées</h3><small>Envoyées par les utilisateurs connectés ; visibles et traitées par les administrateurs.</small><div id="cor-out"></div></div>
+<form class="card" id="a-f" style="margin-top:12px" onsubmit="return false"><h3>Ajouter ou corriger une localité</h3>
+<input type="hidden" id="a-i">
+<input id="a-id" placeholder="Identifiant officiel (vide = identifiant interne)">
+<input id="a-n" placeholder="Nom officiel *"><input id="a-al" placeholder="Variantes d’orthographe / noms alternatifs (séparés par « ; »)">
+<select id="a-d"></select><input id="a-a" list="dl-a" placeholder="Arrondissement"><input id="a-c" list="dl-c" placeholder="Commune de rattachement">
+<datalist id="dl-a"></datalist><datalist id="dl-c"></datalist>
+<select id="a-t"><option>village</option><option>hameau</option><option>quartier</option><option>commune</option></select>
+<input id="a-par" placeholder="Rattaché à (pour un hameau)">
+<input id="a-la" type="number" step="any" placeholder="Latitude"><input id="a-lo" type="number" step="any" placeholder="Longitude">
+<input id="a-p" type="number" min="0" placeholder="Population"><input id="a-m" type="number" min="0" placeholder="Nombre de ménages"><input id="a-k" type="number" min="0" placeholder="Nombre de concessions"><input id="a-py" placeholder="Année de référence">
+<input id="a-cu" placeholder="Principales cultures (à confirmer)"><input id="a-ac" placeholder="Activités agricoles"><input id="a-el" placeholder="Élevage"><input id="a-ea" placeholder="Ressources en eau">
+<input id="a-inf" placeholder="Infrastructures agricoles"><input id="a-mk" placeholder="Marchés accessibles"><input id="a-bs" placeholder="Besoins agricoles identifiés">
+<input id="a-sr" placeholder="Source"><input id="a-dt" type="date" aria-label="Date de la source"><input id="a-dv" type="date" aria-label="Date de vérification">
+<select id="a-st"><option>À confirmer</option><option>Vérifiée</option><option>Non disponible</option></select>
+<button class="btn g" onclick="saveV()">Enregistrer la localité</button></form>
+<div class="card" style="margin-top:12px"><h3>Importer / mettre à jour le répertoire (CSV ou JSON)</h3>
+<p>Source prioritaire : Répertoire des localités du RGPH-5 2023 (ANSD, ansd.sn → « Répertoire des localités »). Colonnes reconnues (noms flexibles) : id, nom, region, departement, arrondissement, commune, type, latitude, longitude, population, menages, concessions, annee_population, cultures, eau, source, date_source, date_verification, statut, noms_alternatifs. Les lignes d’autres régions sont ignorées. Un nouvel import met à jour les localités existantes sans doublon.</p>
+<label><input type="checkbox" id="imp-ref" style="width:auto"> Utiliser aussi ce fichier comme référence officielle de comparaison</label>
+<input id="imp" type="file" accept=".csv,.tsv,.txt,.json,text/csv,application/json" onchange="importFile(this)"><div id="imp-out"></div></div>
+<div class="card" style="margin-top:12px"><h3>Référence officielle de comparaison</h3>
+<p>Liste ANSD (colonnes nom, departement, commune) servant uniquement au contrôle des manquants, doublons et fautes.</p>
+<div id="ref-info"></div><input id="refin" type="file" accept=".csv,.tsv,.txt,.json" onchange="importRef(this)"></div>
+<div class="card" style="margin-top:12px"><h3>Limites administratives et zones (GeoJSON)</h3>
+<p>Fichier officiel de limites : chaque entité avec une propriété « niveau » (departement, arrondissement, commune ou zone) et « nom ». Aucune limite n’est dessinée sans fichier officiel.</p>
+<div id="geo-info"></div><input id="geoin" type="file" accept=".geojson,.json,application/geo+json,application/json" onchange="importGeo(this)"></div>
+<div class="card" style="margin-top:12px"><h3>Journal des mises à jour</h3><div id="jr-out"></div></div>
+<div class="card" style="margin-top:12px"><h3>Serveur GAYNAKO (API)</h3><input id="s-api" placeholder="https://api.exemple.sn"><input id="s-tok" type="password" placeholder="Jeton d’accès (serveur personnalisé seulement)"><button class="btn g" onclick="saveAPI()">Enregistrer</button><button class="btn o" onclick="health()">Tester la connexion</button><div id="s-out"></div></div>
+<button class="btn g noprint" onclick="window.print()">🖨️ Rapport PDF (impression)</button>
+<button class="btn o noprint" onclick="csvV()">📥 Localités (CSV)</button><button class="btn o noprint" onclick="jsonV()">📥 Localités (JSON)</button>
+
+</div>
+</section>
+</main>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js"></script>
+<script>
+const $=id=>document.getElementById(id),esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),nz=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+const mem={},S={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):(mem[k]??d)}catch(e){return mem[k]??d}},set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(k==="vil"||k==="ref")toast("Stockage du téléphone plein : exportez vos données.");return false}}};
+const fmt=n=>n.toLocaleString("fr-FR"),ND="Non disponible";
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2800)}
+function theme(){const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark"}
+const ADM={"Kaolack":{arr:["Koumbal","Ndiédieng","Ngothie"],com:["Kaolack","Kahone","Keur Baka","Latmingué","Thiaré","Ndoffane","Keur Socé","Ndiaffate","Ndiédieng","Dya","Ndiébel","Thiomby","Gandiaye","Sibassor"]},
+"Guinguinéo":{arr:["Mbadakhoune","Nguelou"],com:["Guinguinéo","Mbadakhoune","Ndiago","Ngathie Naoudé","Khelcom Birame","Fass","Gagnick","Nguelou","Ourour","Dara Mboss","Panal Ouolof","Mboss"]},
+"Nioro du Rip":{arr:["Médina Sabakh","Paoskoto","Wack Ngouna"],com:["Nioro","Kayemor","Médina Sabakh","Ngayène","Gainthe Kaye","Paoskoto","Porokhane","Taïba Niassène","Dabaly","Darou Salam","Keur Maba Diakhou","Ndramé Escale","Wack Ngouna","Keur Mandongo","Keur Madiabel"]}},DEPTS=Object.keys(ADM),DO=DEPTS.map(d=>`<option>${d}</option>`).join("");
+["v-d","f-d"].forEach(i=>$(i).innerHTML='<option value="">Tous les départements</option>'+DO);["a-d","p-d"].forEach(i=>$(i).innerHTML=DO);
+const TABS=[["compte","🔐 Compte"],["accueil","🏠 Accueil"],["villages","🏘️ Villages"],["diag","📷 Diagnostic"],["img","🖼️ Images"],["sol","🧪 Sol"],["eco","💰 Économie"],["froid","❄️ Froid"],["machines","🚜 Machines"],["carte","🗺️ Carte"],["moi","👤 Mon espace"],["voix","🎤 Assistant"],["admin","⚙️ Admin"]];
+$("nav").innerHTML=TABS.map(t=>`<button data-t="${t[0]}" onclick="go('${t[0]}')">${t[1]}</button>`).join("");
+function go(id){document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===id));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===id));
+if(id==="accueil")hk();if(id==="carte")map();if(id==="compte")renderAcc();if(id==="admin")admShow();if(id==="froid"||id==="machines")bkBox();if(id==="villages")vlist();window.scrollTo(0,0)}
+/* Langue et voix */
+const PH={fr:{hello:"Bonjour. Bienvenue sur GAYNAKO AI. Comment pouvons-nous vous aider dans votre activité agricole ?",photo:"Prenez une photo nette de la feuille, de la tige ou du fruit."},
+wo:{hello:"Dalal ak jàmm ci GAYNAKO AI.",photo:"Jëlal nataal bu leer ci xob bi walla garab gi."}};
+const LI={fr:"Français : reconnaissance et lecture vocales selon votre navigateur.",wo:"Wolof : phrases de travail à faire valider par au moins deux locuteurs natifs. Sans voix wolof installée sur le téléphone, le texte s’affiche mais n’est pas lu.",srr:"Sérère : aucune traduction n’est affichée tant qu’elle n’est pas validée par des locuteurs natifs."};
+function setLang(l){S.set("lang",l);$("lang").value=l;$("p-l").value=l;$("linfo").textContent=LI[l];$("wl").style.display="none"}
+function say(k){const l=$("lang").value,t=PH[l]&&PH[l][k];
+if(!t){$("heard").textContent="Traduction sérère en attente de validation.";return toast("Sérère : en attente de validation.")}
+$("heard").textContent=t;if(!("speechSynthesis" in window))return toast("Lecture vocale non supportée.");
+const v=speechSynthesis.getVoices().find(x=>x.lang.toLowerCase().startsWith(l==="wo"?"wo":"fr"));
+if(!v)return toast("Aucune voix "+(l==="wo"?"wolof":"française")+" : texte affiché seulement.");
+const u=new SpeechSynthesisUtterance(t);u.voice=v;u.lang=v.lang;speechSynthesis.cancel();speechSynthesis.speak(u)}
+let REC=null;
+async function listenServer(){if(REC){REC.stop();return}
+try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),ch=[];REC=new MediaRecorder(st);REC.ondataavailable=e=>ch.push(e.data);$("mic").classList.add("rec");
+REC.onstop=async()=>{st.getTracks().forEach(t=>t.stop());REC=null;$("mic").classList.remove("rec");const fd=new FormData();fd.append("audio",new Blob(ch,{type:"audio/webm"}),"q.webm");fd.append("lang",$("lang").value);
+try{const r=await fetch(CFG.API+"/assistant",{method:"POST",body:fd,headers:H()});if(!r.ok)throw 0;const j=await r.json();
+$("heard").innerHTML="<b>Vous :</b> "+esc(j.transcript)+"<br><b>GAYNAKO :</b> "+esc(j.answer)+(j.note?"<br><i>"+esc(j.note)+"</i>":"");
+if(j.audio_b64){window.LA=new Audio("data:"+j.audio_mime+";base64,"+j.audio_b64);window.LA.volume=.9;window.LA.play()}else if($("lang").value==="fr")speakTxt(j.answer)}catch(e){toast("Assistant indisponible.")}};REC.start();toast("Parlez, puis touchez à nouveau le micro.")}catch(e){toast("Micro refusé.")}}
+function listen(){if(REC||(IA_OK&&!iaLogin()))return listenServer();const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if($("lang").value!=="fr")return toast("Reconnaissance vocale : français seulement pour l’instant.");
+if(!SR)return toast("Reconnaissance vocale non supportée par ce navigateur.");
+const r=new SR();r.lang="fr-FR";$("mic").classList.add("rec");
+r.onresult=e=>{const t=e.results[0][0].transcript;$("heard").textContent="Vous avez dit : « "+t+" »";const l=nz(t);
+if(/diagnos|maladie|plante/.test(l))go("diag");else if(/froid|stock/.test(l))go("froid");else if(/machine|tracteur/.test(l))go("machines");else if(/carte/.test(l))go("carte");else if(/village/.test(l))go("villages")};
+r.onerror=()=>toast("Micro indisponible ou refusé.");r.onend=()=>$("mic").classList.remove("rec");
+try{r.start()}catch(e){$("mic").classList.remove("rec")}}
+/* Villages : répertoire des localités de la région de Kaolack */
+let V=S.get("vil",[]),VL=50,VONLY=null,COR=S.get("cor",[]),JR=S.get("jr",[]);
+function newId(){return "GK-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+(()=>{let c=0;V.forEach(v=>{if(!v.id){v.id=newId();v.idg=1;c=1}});if(c)S.set("vil",V)})();
+const STC={"Vérifiée":"v","À confirmer":"","Non disponible":"n"};
+const fz=t=>nz(t).replace(/[^a-z0-9]/g,"").replace(/(.)\1+/g,"$1").replace(/ph/g,"f").replace(/ou/g,"u").replace(/y/g,"i");
+const vkey=v=>nz(v.d)+"|"+nz(v.c)+"|"+nz(v.n);
+function lev(a,b){if(a===b)return 0;if(Math.abs(a.length-b.length)>2)return 9;let p=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const c=[i];for(let j=1;j<=b.length;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[b.length]}
+function fillAC(D,A,C,fromA){const d=$(D).value;
+if(!fromA){const base=d?ADM[d].arr:DEPTS.flatMap(x=>ADM[x].arr),set=[...new Set([...base,...V.filter(v=>(!d||v.d===d)&&v.a).map(v=>v.a)])];
+$(A).innerHTML='<option value="">Tous les arrondissements</option>'+set.map(o=>`<option>${esc(o)}</option>`).join("")}
+const a=$(A).value,base=d?ADM[d].com:DEPTS.flatMap(x=>ADM[x].com),fromData=V.filter(v=>(!d||v.d===d)&&(!a||v.a===a)&&v.c).map(v=>v.c);
+const cs=a&&fromData.length?[...new Set(fromData)]:[...new Set([...base,...fromData])];
+$(C).innerHTML='<option value="">Toutes les communes</option>'+cs.sort((x,y)=>x.localeCompare(y,"fr")).map(o=>`<option>${esc(o)}</option>`).join("")}
+const fillAR=()=>fillAC("v-d","v-a","v-c",false),fillCM=()=>fillAC("v-d","v-a","v-c",true);
+function fillDL(){$("dl-a").innerHTML=[...new Set([...DEPTS.flatMap(x=>ADM[x].arr),...V.map(v=>v.a).filter(Boolean)])].map(o=>`<option value="${esc(o)}">`).join("");
+$("dl-c").innerHTML=[...new Set([...DEPTS.flatMap(x=>ADM[x].com),...V.map(v=>v.c).filter(Boolean)])].map(o=>`<option value="${esc(o)}">`).join("")}
+function covText(){const R=S.get("ref",null);if(!R||!R.l||!R.l.length)return "Comparaison avec le répertoire officiel ANSD non effectuée : la liste n’est pas confirmée exhaustive.";const C=ctlData();return "Couverture du répertoire : "+C.cov+" % ("+fmt(C.matched)+" sur "+fmt(R.l.length)+" localités de la référence)."}
+function findHome(){go("villages");$("v-q").value=$("h-q").value;vlist(true)}
+function fiche(v,i){const g=x=>x?esc(x):'<i>À collecter / confirmer</i>';
+return `<div class="warn ok"><b>${esc(v.n)}</b><br>Département : <b>${esc(v.d)}</b><br>Arrondissement : <b>${esc(v.a||ND)}</b><br>Commune : <b>${esc(v.c||ND)}</b>${v.par?"<br>Rattaché à : "+esc(v.par):""}</div>
+<p>Type : ${esc(v.t||"village")} · Identifiant : ${esc(v.id)}${v.idg?" (interne)":""}${v.al?"<br>Autres orthographes : "+esc(v.al):""}<br>
+Population : ${v.p!=null?fmt(v.p)+" ("+esc(v.py||"année non précisée")+")":ND} · Ménages : ${v.m!=null?fmt(v.m):ND} · Concessions : ${v.k!=null?fmt(v.k):ND}<br>
+GPS : ${v.la!=null?v.la+", "+v.lo+(v.st==="Vérifiée"?" (vérifiées)":" (non vérifiées)"):ND}<br>
+Principales cultures : ${g(v.cu)}<br>Activités agricoles : ${g(v.ac)}<br>Élevage : ${g(v.el)}<br>Ressources en eau : ${g(v.ea)}<br>Infrastructures agricoles : ${g(v.inf)}<br>Marchés accessibles : ${g(v.mk)}<br>Besoins agricoles : ${g(v.bs)}<br>
+Source : ${esc(v.sr||ND)} · ${esc(v.dt||"date inconnue")} · Vérifiée le : ${esc(v.dv||ND)}</p>
+<div id="vw${i}"></div>
+${v.la!=null?`<button class="btn s g" onclick="vmap(${i})">🗺️ Carte</button><button class="btn s g" onclick="vwx(${i})">🌦️ Météo ici</button>`:""}<button class="btn s o" onclick="corr(${i})">📝 Signaler une correction</button>${VADM?`<button class="btn s o" onclick="editV(${i})">✏️ Modifier (admin)</button><button class="btn s o" onclick="delV(${i})">🗑️ Supprimer</button>`:""}`}
+function vlist(reset){if(reset===true){VL=50;VONLY=null}
+const q=$("v-q").value,qn=nz(q),qf=fz(q),d=$("v-d").value,a=$("v-a").value,c=$("v-c").value,s=$("v-s").value;
+let L=V.map((v,i)=>[v,i]);
+if(VONLY)L=L.filter(([v])=>v.id===VONLY);
+else{L=L.filter(([v])=>(!d||v.d===d)&&(!a||v.a===a)&&(!c||v.c===c)&&(!s||v.st===s)&&(!q||nz([v.n,v.al,v.c,v.cu].join(" ")).includes(qn)||(qf.length>=3&&fz([v.n,v.al].join(" ")).includes(qf))));
+L.sort((x,y)=>(q?(nz(x[0].n).startsWith(qn)?0:1)-(nz(y[0].n).startsWith(qn)?0:1):0)||x[0].n.localeCompare(y[0].n,"fr"))}
+$("v-stat").textContent=V.length?L.length+" localité(s) affichée(s) sur "+V.length+" enregistrée(s). "+covText():"Aucune localité enregistrée. "+covText();
+$("v-out").innerHTML=(VONLY?'<button class="btn o" onclick="vlist(true)">← Retour à la liste</button>':"")+(!V.length?'<div class="warn"><b>Aucune localité enregistrée.</b> Un administrateur importe le répertoire officiel ANSD (Admin → Importer). Aucun nom, aucune coordonnée et aucun chiffre n’est inventé.</div>':L.length?L.slice(0,VL).map(([v,i])=>`<details class="card" style="margin-bottom:8px"${VONLY?" open":""}><summary>${esc(v.n)} <span class="tag ${STC[v.st]||""}">${esc(v.st)}</span><br><small>${esc(v.c||ND)} › ${esc(v.a||ND)} › ${esc(v.d)}</small></summary>${fiche(v,i)}</details>`).join(""):'<div class="warn">Aucun résultat. Essayez une autre orthographe ou retirez un filtre.</div>');
+$("v-more").style.display=!VONLY&&L.length>VL?"block":"none";hier()}
+function hier(){const cd={},ca={},cc={};V.forEach(v=>{cd[v.d]=(cd[v.d]||0)+1;if(v.a){const k=v.d+"|"+v.a;ca[k]=(ca[k]||0)+1}if(v.c){const k=v.d+"|"+v.c;cc[k]=(cc[k]||0)+1}});
+const bt=(d,a,c,l,n)=>`<button class="btn s o" data-d="${esc(d)}" data-a="${esc(a)}" data-c="${esc(c)}" onclick="hpick(this.dataset.d,this.dataset.a,this.dataset.c)">${esc(l)} (${n})</button>`;
+$("v-hier").innerHTML='<div class="warn">Liste des subdivisions reprise du cahier des charges : <b>à confirmer</b> avec le référentiel officiel. Les rattachements arrondissement ↔ commune viennent de l’import ANSD. Ne pas confondre chef-lieu, commune et village.</div>'+DEPTS.map(d=>`<details class="card" style="margin:6px 0"><summary><b>Département de ${esc(d)}</b> — ${cd[d]||0} localité(s)</summary><b>Arrondissements</b><br>${ADM[d].arr.map(a=>bt(d,a,"",a,ca[d+"|"+a]||0)).join("")}<br><b>Communes</b><br>${ADM[d].com.map(c=>bt(d,"",c,c,cc[d+"|"+c]||0)).join("")}</details>`).join("")}
+function hpick(d,a,c){$("v-q").value="";VONLY=null;$("v-d").value=d;fillAC("v-d","v-a","v-c",false);if(a){$("v-a").value=a;fillAC("v-d","v-a","v-c",true)}if(c)$("v-c").value=c;$("v-s").value="";vlist(true);$("v-stat").scrollIntoView()}
+function openV(i){go("villages");$("v-q").value="";VONLY=V[i].id;vlist();window.scrollTo(0,0)}
+function openByID(id){const i=V.findIndex(v=>v.id===id);i>=0?openV(i):toast("Localité introuvable.")}
+function vmap(i){go("carte");setTimeout(()=>{if(LM)LM.setView([V[i].la,V[i].lo],13)},400)}
+async function vwx(i){const v=V[i],e=$("vw"+i);e.textContent="Chargement de la météo…";
+try{const j=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${v.la}&longitude=${v.lo}&current=temperature_2m,relative_humidity_2m&daily=precipitation_sum,temperature_2m_max&timezone=auto&forecast_days=3`)).json();
+e.innerHTML=`<div class="warn"><b>Prévision Open-Meteo (non certaine)</b><br>Maintenant : ${j.current.temperature_2m} °C, humidité ${j.current.relative_humidity_2m} %<br>`+j.daily.time.map((t,k)=>`${esc(t)} : max ${j.daily.temperature_2m_max[k]} °C · pluie ${j.daily.precipitation_sum[k]} mm`).join("<br>")+"</div>"}catch(x){e.innerHTML='<div class="warn err">Météo indisponible (connexion).</div>'}}
+const EF=["id","n","al","d","a","c","t","par","la","lo","p","m","k","py","cu","ac","el","ea","inf","mk","bs","sr","dt","dv","st"];
+function editV(i){const v=V[i];EF.forEach(k=>$("a-"+k).value=v[k]??"");$("a-i").value=i;go("admin");$("a-n").focus()}
+function delV(i){if(!isAdm())return toast("Réservé à l’administrateur.");if(!confirm("Supprimer « "+V[i].n+" » ?"))return;const [x]=V.splice(i,1);S.set("vil",V);S.set("vdel",[...S.get("vdel",[]),String(x.id)]);pushVil();VONLY=null;fillAR();fillDL();vlist(true);hk();toast("Localité supprimée.")}
+function saveV(){if(!isAdm())return;const g=i=>$(i).value.trim(),num=i=>g(i)===""?null:+g(i);
+const v={};EF.forEach(k=>v[k]=["la","lo","p","m","k"].includes(k)?num("a-"+k):g("a-"+k));
+if(!v.n||!v.d)return toast("Nom et département obligatoires.");
+if((v.la===null)!==(v.lo===null))return toast("Renseignez latitude et longitude.");
+if(v.la!==null&&(v.la<13||v.la>15||v.lo<-17||v.lo>-14.5))return toast("Coordonnées hors de la région de Kaolack.");
+if([v.p,v.m,v.k].some(x=>x!==null&&!(x>=0)))return toast("Population, ménages et concessions : nombres positifs.");
+if(v.st==="Vérifiée"&&(!v.sr||!v.dt))return toast("« Vérifiée » exige une source et une date de source.");
+const i=g("a-i");
+if(!v.id){if(i!==""&&V[+i]){v.id=V[+i].id;if(V[+i].idg)v.idg=1}else{v.id=newId();v.idg=1}}
+if(V.some((x,k)=>String(k)!==i&&(x.id===v.id||vkey(x)===vkey(v))))return toast("Cette localité existe déjà (même nom, commune et département).");
+i===""?V.push(v):V[+i]=v;S.set("vil",V);pushVil();$("a-f").reset();$("a-i").value="";
+const off=(v.c&&!ADM[v.d].com.some(x=>nz(x)===nz(v.c)))||(v.a&&!ADM[v.d].arr.some(x=>nz(x)===nz(v.a)));
+toast(off?"Enregistré. Commune ou arrondissement hors liste : rattachement à vérifier.":"Localité enregistrée.");fillAR();fillDL();admin()}
+var VADM=false; /* vrai quand un administrateur est connecté */
+/* Corrections : envoyées au serveur, visibles et traitées par les administrateurs */
+function corr(i){const v=V[i];if(!me()){toast("Connectez-vous pour envoyer une correction.");return go("compte")}
+const c=prompt("Quelle information est à corriger pour « "+v.n+" » ? (ex. commune, population, coordonnées, orthographe)");if(!c||!c.trim())return;const n=prompt("Valeur correcte proposée et sa source si possible");if(!n||!n.trim())return;
+return act(async()=>{const {error}=await sb.from("corrections").insert({vid:String(v.id).slice(0,80),vn:v.n.slice(0,150),info:c.trim().slice(0,500),proposition:n.trim().slice(0,1000)});if(error)throw error;toast("Correction envoyée à l’administrateur.");refresh()})}
+function setCor(id,st){return act(async()=>{const {error}=await sb.from("corrections").update({statut:st}).eq("id",id);if(error)throw error;await refresh()})}
+function rCor(){$("cor-out").innerHTML=DB.cor.length?DB.cor.map(c=>`<div class="warn"><b>${esc(c.vn)}</b> — ${esc(c.info)}<br>Proposition : ${esc(c.proposition)}<br><small>${esc(new Date(c.cree).toLocaleString("fr-FR"))} · ${esc(c.statut)}</small><br><button class="btn s o" data-v="${esc(c.vid)}" onclick="openByID(this.dataset.v)">Voir la fiche</button><button class="btn s g" onclick="setCor(${+c.id},'traitée')">Traitée</button><button class="btn s o" onclick="setCor(${+c.id},'rejetée')">Rejeter</button></div>`).join(""):"Aucune correction signalée."}
+/* Répertoire partagé : lecture pour tous, écriture réservée aux administrateurs.
+   vsync = empreinte de chaque localité telle que vue sur le serveur ; vdel = suppressions à publier */
+const vh=o=>{const s=JSON.stringify(Object.keys(o).sort().map(k=>[k,o[k]]));let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)};
+const vPending=()=>{const sn=S.get("vsync",{});return V.filter(v=>String(v.id).length<=80&&sn[v.id]!==vh(v))};
+function vClean(d,id){const o={...d,id};["la","lo","p","m","k"].forEach(k=>o[k]=o[k]===null||o[k]===""||o[k]===undefined||isNaN(+o[k])?null:+o[k]);o.n=String(o.n||"");return o.n&&ADM[o.d]?o:null}
+function vShow(){fillAR();fillDL();mapFill();hk();vlist(true);if(ADMOK)admin()}
+let VPULL=0,VBUSY=false;
+async function pullVil(force){if(!sb||VBUSY||(!force&&Date.now()-VPULL<60000))return vStat();if($("a-i").value!=="")return;VBUSY=true;
+try{const rows=await allRows(()=>sb.from("localites").select("id,data").order("id"));VPULL=Date.now();
+const R=new Map();rows.forEach(r=>{const o=vClean(r.data,r.id);if(o)R.set(r.id,o)});
+const sn=S.get("vsync",{}),del=new Set(isAdm()?S.get("vdel",[]):[]),nsn={},out=[],seen=new Set();
+V.forEach(v=>{const r=R.get(v.id),edited=sn[v.id]!==vh(v);seen.add(v.id);
+if(r){if(isAdm()&&edited&&sn[v.id]!==undefined){out.push(v);nsn[v.id]=sn[v.id]}else{out.push(r);nsn[v.id]=vh(r)}}
+else if(sn[v.id]===undefined||(isAdm()&&edited))out.push(v)});
+R.forEach((r,id)=>{if(!seen.has(id)&&!del.has(id)){out.push(r);nsn[id]=vh(r)}});
+const changed=JSON.stringify(out)!==JSON.stringify(V);V=out;if(changed){S.set("vil",V);VONLY=null;vShow()}S.set("vsync",nsn)}
+catch(e){console.warn("Répertoire non synchronisé",e)}finally{VBUSY=false;vStat()}}
+async function pushVil(){if(!sb||!isAdm())return vStat();if(VBUSY){setTimeout(pushVil,1500);return}VBUSY=true;
+try{let del=S.get("vdel",[]);while(del.length){const lot=del.slice(0,50),{error}=await sb.from("localites").delete().in("id",lot);if(error)throw error;del=S.get("vdel",[]).filter(x=>!lot.includes(x));S.set("vdel",del)}
+const todo=[...new Map(vPending().map(v=>[v.id,v])).values()];
+for(let i=0;i<todo.length;i+=400){const lot=todo.slice(i,i+400),maj=new Date().toISOString(),{error}=await sb.from("localites").upsert(lot.map(v=>({id:String(v.id),data:v,maj})));if(error)throw error;
+const sn=S.get("vsync",{});lot.forEach(v=>sn[v.id]=vh(v));S.set("vsync",sn);vStat()}
+if(todo.length)toast("Répertoire publié.")}
+catch(e){toast("Publication du répertoire impossible : "+errTxt(e))}finally{VBUSY=false;vStat()}}
+function vStat(){const e=$("v-sync");if(!e)return;const n=vPending().length+S.get("vdel",[]).length;e.className="warn "+(n?"err":"ok");e.textContent=n?n+" modification(s) du répertoire à publier.":"Répertoire synchronisé avec le serveur."}
+function syncVil(){return pullVil(true).then(pushVil)}
+/* Import / export */
+const AK={id:["id","code","identifiant","idlocalite","codelocalite"],nom:["nom","nomofficiel","localite","nomlocalite","village"],reg:["region"],dep:["departement"],arr:["arrondissement"],com:["commune","communederattachement","communerattachement"],typ:["type","statutadministratif"],lat:["latitude","lat"],lon:["longitude","lon","lng","long"],pop:["population","populationtotale"],men:["menages","nombredemenages","nbmenages"],con:["concessions","nombredeconcessions","nbconcessions"],pya:["anneepopulation","anneereference","annee"],cul:["cultures","culturesdominantes"],eau:["eau","accesaleau"],src:["source","sourceofficielle"],dts:["datesource"],dtv:["dateverification","dateverif"],sta:["statut","statutverification"],alt:["nomsalternatifs","variantes","autresnoms"],par:["rattachea","rattache","parent"]};
+const kn=k=>nz(k).replace(/[^a-z0-9]/g,""),P=(o,k)=>{for(const n of AK[k])if(o[n]!==undefined&&o[n]!=="")return String(o[n]).trim();return ""},N=s=>{if(s===""||s==null)return null;const x=+String(s).replace(/[\s\u00a0]/g,"").replace(",",".");return isNaN(x)?null:x};
+function parseTable(txt,name){txt=txt.replace(/^\ufeff/,"");let rows;
+if(/\.json$/i.test(name)||/^\s*[\[{]/.test(txt)){const j=JSON.parse(txt);rows=Array.isArray(j)?j:j.localites||j.villages||j.data||(j.features||[]).map(f=>({...f.properties,longitude:f.geometry&&f.geometry.coordinates?f.geometry.coordinates[0]:"",latitude:f.geometry&&f.geometry.coordinates?f.geometry.coordinates[1]:""}))||[];
+return rows.map(o=>Object.fromEntries(Object.entries(o).map(([k,v])=>[kn(k),v==null?"":String(v).trim()])))}
+const first=txt.split(/\r?\n/)[0],sep=[";","\t",","].map(s=>[s,first.split(s).length]).sort((a,b)=>b[1]-a[1])[0][0],T=[];let row=[],cur="",q=false;
+for(let i=0;i<txt.length;i++){const ch=txt[i];
+if(q){if(ch==='"'){if(txt[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}
+else if(ch==='"')q=true;else if(ch===sep){row.push(cur);cur=""}
+else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&txt[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))T.push(row);row=[]}else cur+=ch}
+row.push(cur);if(row.some(x=>x.trim()))T.push(row);if(T.length<2)return[];
+const H=T[0].map(kn);return T.slice(1).map(r=>{const o={};H.forEach((h,i)=>o[h]=(r[i]||"").trim());return o})}
+const findDept=s=>{const x=nz(s);return x.length>=5?DEPTS.find(d=>nz(d)===x||nz(d).startsWith(x)):null};
+function importFile(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let rows;try{rows=parseTable(String(r.result),f.name)}catch(e){el.value="";return toast("Fichier illisible (CSV ou JSON attendu).")}
+const asRef=$("imp-ref").checked,st={n:0,u:0,dup:0,bad:0,out:0},iss=[],REFn=[],seen=new Set();
+rows.forEach((o,ix)=>{const nom=P(o,"nom"),reg=P(o,"reg");if(reg&&nz(reg)!=="kaolack"){st.out++;return}
+const d=findDept(P(o,"dep"));if(!nom||!d){st.bad++;iss.push("Ligne "+(ix+2)+" : nom ou département absent ou inconnu ("+(nom||"?")+")");return}
+const la=N(P(o,"lat")),lo=N(P(o,"lon"));
+if((la===null)!==(lo===null)||(la!==null&&(la<13||la>15||lo<-17||lo>-14.5))){st.bad++;iss.push("Ligne "+(ix+2)+" : coordonnées invalides ou hors région ("+nom+")");return}
+const sr=P(o,"src"),dts=P(o,"dts"),sta=nz(P(o,"sta")),
+rec={id:P(o,"id"),n:nom,al:P(o,"alt"),d,a:P(o,"arr"),c:P(o,"com"),t:P(o,"typ"),par:P(o,"par"),la,lo,p:N(P(o,"pop")),m:N(P(o,"men")),k:N(P(o,"con")),py:P(o,"pya"),cu:P(o,"cul"),ea:P(o,"eau"),sr,dt:dts,dv:P(o,"dtv"),st:sta.startsWith("verif")&&sr&&dts?"Vérifiée":"À confirmer"};
+const rk=nz(d)+"|"+nz(rec.c)+"|"+nz(nom);if(!seen.has(rk)){seen.add(rk);REFn.push([nom,d,rec.c])}
+const idx=V.findIndex(v=>(rec.id&&v.id===rec.id)||vkey(v)===vkey(rec));
+if(idx>=0){const v=V[idx];let ch=false;for(const k in rec){if(k==="id"){if(rec.id&&v.idg){v.id=rec.id;delete v.idg;ch=true}continue}if(k==="st"){if(rec.st==="Vérifiée"&&v.st!=="Vérifiée"){v.st=rec.st;ch=true}continue}if(rec[k]!==""&&rec[k]!==null&&rec[k]!==v[k]){v[k]=rec[k];ch=true}}ch?st.u++:st.dup++}
+else{rec.t=rec.t||"village";if(!rec.id){rec.id=newId();rec.idg=1}V.push(rec);st.n++}});
+const ok=S.set("vil",V);pushVil();if(asRef&&REFn.length)S.set("ref",{d:new Date().toLocaleDateString("fr-FR"),f:f.name,l:REFn});
+JR.unshift({d:new Date().toLocaleString("fr-FR"),f:f.name,n:st.n,u:st.u,dup:st.dup,bad:st.bad,out:st.out,ref:asRef});S.set("jr",JR.slice(0,30));
+el.value="";fillAR();fillDL();mapFill();admin();hk();vlist(true);
+$("imp-out").innerHTML=`<div class="warn ${ok?"ok":"err"}"><b>${st.n} nouvelle(s) localité(s), ${st.u} mise(s) à jour, ${st.dup} doublon(s) ou lignes identiques ignorés, ${st.bad} invalide(s), ${st.out} hors région de Kaolack.</b>${ok?"":"<br>Stockage du téléphone plein : exportez les données."}${iss.slice(0,15).map(x=>"<br>"+esc(x)).join("")}${iss.length>15?"<br>… "+(iss.length-15)+" autres":""}<br>Rappel : « Vérifiée » n’est accordé qu’avec source et date de source ; sinon « À confirmer ».</div>`;
+toast("Import terminé.")};r.readAsText(f)}
+function importRef(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let rows;try{rows=parseTable(String(r.result),f.name)}catch(e){el.value="";return toast("Fichier illisible.")}
+const L=[],seen=new Set();rows.forEach(o=>{const nom=P(o,"nom"),reg=P(o,"reg");if(reg&&nz(reg)!=="kaolack")return;const d=findDept(P(o,"dep"));if(!nom||!d)return;const c=P(o,"com"),k=nz(d)+"|"+nz(c)+"|"+nz(nom);if(seen.has(k))return;seen.add(k);L.push([nom,d,c])});
+el.value="";if(!L.length)return toast("Aucune localité de Kaolack reconnue dans ce fichier.");S.set("ref",{d:new Date().toLocaleDateString("fr-FR"),f:f.name,l:L});admin();toast("Référence chargée : "+L.length+" localités.")};r.readAsText(f)}
+function importGeo(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const j=JSON.parse(String(r.result));if(!/FeatureCollection|Feature/.test(j.type||""))throw 0;await pput("geo",j);el.value="";toast("Limites enregistrées.");admin();map()}catch(e){toast("GeoJSON invalide.")}};r.readAsText(f)}
+const VF=["id","nom","noms_alternatifs","region","departement","arrondissement","commune","type","rattache_a","latitude","longitude","population","menages","concessions","annee_reference","cultures","activites_agricoles","elevage","eau","infrastructures_agricoles","marches","besoins","source","date_source","date_verification","statut"];
+const vrow=v=>[v.id,v.n,v.al,"Kaolack",v.d,v.a,v.c,v.t,v.par,v.la,v.lo,v.p,v.m,v.k,v.py,v.cu,v.ac,v.el,v.ea,v.inf,v.mk,v.bs,v.sr,v.dt,v.dv,v.st];
+function csvV(){dl("gaynako-localites-kaolack.csv",[VF,...V.map(vrow)])}
+function jsonV(){const o={region:"Kaolack",genere_le:new Date().toISOString(),nombre:V.length,avertissement:"Export de l’application. Exhaustivité non garantie sans comparaison avec la référence ANSD.",localites:V.map(v=>{const r=vrow(v);return Object.fromEntries(VF.map((k,j)=>[k,r[j]??null]))})};
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,1)],{type:"application/json"}));a.download="gaynako-localites-kaolack.json";a.click()}
+function dl(n,rows){const t="\ufeff"+rows.map(r=>r.map(c=>`"${String(c??"").replace(/^(?=[=+\-@\t\r])(?!-?\d+(\.\d+)?$)/,"'").replace(/"/g,'""')}"`).join(";")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));a.download=n;a.click()}
+/* Démonstration : froid et machines */
+const ROOMS=[{id:1,n:"Chambre froide A",d:"Kaolack",cap:20,rest:12,p:15,ll:[14.15,-16.07]},{id:2,n:"Chambre froide B",d:"Guinguinéo",cap:10,rest:6,p:18,ll:[14.27,-15.95]},{id:3,n:"Chambre froide C",d:"Nioro du Rip",cap:15,rest:9,p:12,ll:[13.75,-15.8]}];
+const MACH=[{id:1,n:"Motoculteur",d:"Kaolack",p:15000,ll:[14.12,-16.05]},{id:2,n:"Tracteur 75 CV",d:"Guinguinéo",p:45000,ll:[14.26,-15.93]},{id:3,n:"Batteuse à mil",d:"Nioro du Rip",p:25000,ll:[13.77,-15.78]},{id:4,n:"Décortiqueuse d’arachide",d:"Kaolack",p:20000,ll:[14.18,-16.1]}];
+let rooms=S.get("rooms",null)||ROOMS;
+function renderRooms(){$("rooms").innerHTML=rooms.map(r=>`<div class="card"><b>${r.n}</b> <span class="tag">démo</span><br>Dép. ${r.d}<div class="bar" style="margin:8px 0"><i style="width:${100-r.rest/r.cap*100}%"></i></div>${r.rest} t libres sur ${r.cap} t (valeur fictive)<br>Tarif : ${r.p} FCFA/kg/jour<br><button class="btn o" onclick="$('r-room').value=${r.id};$('r-kg').focus()">Réserver ici</button></div>`).join("");
+$("r-room").innerHTML=rooms.map(r=>`<option value="${r.id}">${r.n} — ${r.d}</option>`).join("");
+$("r-hist").innerHTML=S.get("rh",[]).map(h=>`<div>• ${esc(h)}</div>`).join("")||"Aucune opération."}
+function renderM(){$("mlist").innerHTML=MACH.map(m=>`<div class="card"><b>${m.n}</b> <span class="tag">démo</span><br>Dép. ${m.d}<br>${fmt(m.p)} FCFA/jour</div>`).join("");
+$("m-sel").innerHTML=MACH.map(m=>`<option value="${m.id}">${m.n} — ${m.d}</option>`).join("");cost();
+$("m-hist").innerHTML=S.get("mh",[]).map(h=>`<div>• ${esc(h)}</div>`).join("")||"Aucune réservation."}
+function cost(){const m=MACH.find(x=>x.id==$("m-sel").value),j=+$("m-days").value||1,n=+$("m-n").value||1;$("m-cost").textContent=`Total ${fmt(m.p*j)} FCFA, soit ${fmt(Math.ceil(m.p*j/n))} FCFA par producteur (${n}).`}
+["m-sel","m-days","m-n"].forEach(i=>$(i).addEventListener("input",cost));
+/* Diagnostic */
+const CULT=["Arachide","Mil","Maïs","Sorgho","Riz","Niébé","Pastèque","Tomate","Oignon","Chou","Piment","Manioc","Mangue","Agrumes","Gombo","Patate douce","Sésame"];$("culture").innerHTML=CULT.map(c=>`<option>${c}</option>`).join("");
+const IA_URL="https://hjrilpeelopzguwgulze.supabase.co/functions/v1/ia";var IA_TOKEN=null,IA_OK=false; /* serveur IA intégré (Supabase) ; une autre adresse peut être saisie dans Admin */
+const CFG={API:(S.get("api","")||IA_URL).replace(/\/$/,""),TOKEN:S.get("tok",null)},
+/* le jeton du compte n'est envoyé qu'au serveur intégré */
+H=()=>{const t=CFG.API===IA_URL?IA_TOKEN:CFG.TOKEN;return t?{Authorization:"Bearer "+t}:{}},
+iaLogin=()=>CFG.API===IA_URL&&!IA_TOKEN,iaErr=async r=>((await r.json().catch(()=>({}))).error)||"Service d’IA indisponible pour le moment.";
+let FILES=[];
+const idb=new Promise(res=>{try{const q=indexedDB.open("gk",1);q.onupgradeneeded=()=>q.result.createObjectStore("p");q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)}catch(e){res(null)}});
+async function pput(k,v){const d=await idb;if(d)d.transaction("p","readwrite").objectStore("p").put(v,k)}
+async function pget(k){const d=await idb;return d?new Promise(r=>{const q=d.transaction("p").objectStore("p").get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r()}):void 0}
+function loadImg(f){return new Promise((ok,ko)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=u})}
+["ph-cam","ph-gal"].forEach(id=>$(id).addEventListener("change",e=>{[...e.target.files].forEach(f=>{if(FILES.length<8&&/^image\//.test(f.type)&&f.size<15e6)FILES.push(f)});e.target.value="";
+$("thumbs").innerHTML=FILES.map(f=>`<img alt="" src="${URL.createObjectURL(f)}">`).join("")}));
+function quality(img){const c=document.createElement("canvas"),w=c.width=160,h=c.height=Math.round(160*img.height/img.width),x=c.getContext("2d");x.drawImage(img,0,0,w,h);
+const d=x.getImageData(0,0,w,h).data,g=[];let s=0;for(let i=0;i<d.length;i+=4){const v=.3*d[i]+.59*d[i+1]+.11*d[i+2];g.push(v);s+=v}
+let lap=0,n=0;for(let y=1;y<h-1;y++)for(let X=1;X<w-1;X++){const i=y*w+X,l=4*g[i]-g[i-1]-g[i+1]-g[i-w]-g[i+w];lap+=l*l;n++}return{mean:s/g.length,blur:lap/n}}
+async function analyse(){if(!FILES.length)return $("res").innerHTML='<div class="warn err">Ajoutez d’abord au moins une photo.</div>';
+setP(10,"Contrôle de la qualité des photos…");const good=[],bad=[];for(const f of FILES){try{const q=quality(await loadImg(f));const m=q.mean<50?"trop sombre":q.mean>215?"trop claire":q.blur<25?"floue":"";m?bad.push(f.name+" : "+m):good.push(f)}catch(e){bad.push(f.name+" : illisible")}}
+if(!good.length)return $("res").innerHTML=`<div class="warn err"><b>Photo insuffisante.</b> ${bad.map(esc).join("<br>")}<br>Reprenez une photo nette, en pleine lumière, à 20 cm de la zone atteinte.</div>`;
+const it={id:Date.now(),c:$("culture").value,o:$("organe").value,v:$("d-vil").value.trim(),sy:$("d-sym").value.trim(),n:good.length,d:new Date().toLocaleString("fr-FR"),st:"attente"};
+setP(35,"Photos contrôlées et enregistrées");await pput(it.id,good);const qu=S.get("q",[]);qu.unshift(it);S.set("q",qu);FILES=[];$("thumbs").innerHTML="";
+$("res").innerHTML=`<div class="warn ok"><b>${good.length} photo(s) enregistrée(s).</b>${bad.length?"<br>Écartées : "+bad.map(esc).join(", "):""}</div>`;await sync();renderQ()}
+const STAT={probable:["Résultat probable","ok"],incertain:["Résultat incertain","err"],photo_insuffisante:["Photo insuffisante","err"],plusieurs_possibles:["Plusieurs maladies possibles",""]};
+const ul=a=>a&&a.length?"<ul>"+a.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>":ND;
+async function showRes(r,id){const fs=(await pget(id))||[],u=fs[0]?URL.createObjectURL(fs[0]):"",s=STAT[r.statut]||STAT.incertain,zs=(r.zones||[]).filter(z=>z.w>0&&z.h>0);
+const ms=(r.maladies||[]).map(m=>`<details class="card" open><summary>${esc(m.nom)} <i>${esc(m.nom_scientifique||"")}</i> — confiance ${Math.round((m.confiance||0)*100)} %</summary>
+<p><b>Gravité estimée :</b> ${esc(m.gravite||ND)} · <b>Fiabilité de la fiche :</b> ${esc(m.fiabilite||ND)}<br><b>Noms locaux :</b> wolof ${esc(m.nom_wolof||ND)} · sérère ${esc(m.nom_serere||ND)}</p>
+<b>Mesures immédiates</b>${ul(m.mesures_immediates)}<b>Symptômes détectés</b>${ul(m.symptomes)}<b>Causes probables</b>${ul(m.causes)}<b>Conditions favorables</b>${ul(m.conditions)}<b>Solutions agronomiques</b>${ul(m.solutions_agro)}<b>Prévention</b>${ul(m.prevention)}<b>Irrigation / fertilisation</b>${ul(m.irrigation_fertilisation)}
+<b>Produits homologués</b>${m.produits_homologues&&m.produits_homologues.length&&m.sources&&m.sources.length?ul(m.produits_homologues):" Aucun indiqué : à confirmer par un agent agricole."}<br><small>Sources : ${(m.sources||[]).map(esc).join(" ; ")||ND}</small></details>`).join("");
+$("res").innerHTML=`<div class="warn ${s[1]}"><span class="st">${s[0]}</span><br>Culture reconnue : ${esc(r.culture||ND)}</div>
+${u?`<div class="ov"><img alt="Photo analysée" src="${u}">${zs.map(z=>`<i style="left:${z.x*100}%;top:${z.y*100}%;width:${z.w*100}%;height:${z.h*100}%"></i>`).join("")}</div><br><small>${zs.length?"Zones suspectes fournies par le modèle.":"Aucune zone fournie par le modèle."}</small>`:""}
+${ms||'<div class="warn">Aucune maladie proposée.</div>'}
+<div class="warn">${r.statut!=="probable"?"<b>Consultation agronomique recommandée.</b> ":""}Ce résultat est une hypothèse, pas un diagnostic certain. Aucun produit ou dosage ne doit être appliqué sans l’avis d’un technicien agricole et le respect de la réglementation.</div>
+${exb(r)}<button class="btn g" onclick="speakRes()">🔊 ÉCOUTER LE DIAGNOSTIC</button><button class="btn o" onclick="askAbout()">💬 POSER UNE QUESTION À L’IA</button><button class="btn o" onclick="illus()">🖼️ ILLUSTRER (image IA indicative)</button><button class="btn o" onclick="expert()">👨‍🌾 CONSULTER UN AGRONOME</button><button class="btn o" onclick="follow(${id})">💾 ENREGISTRER MON DIAGNOSTIC (note de suivi)</button><button class="btn s o" onclick="cmp(${id})">Comparer avec l’observation précédente</button><div id="cmp"></div>`;window.LASTRES=r}
+function speakRes(){const r=window.LASTRES,m=r&&r.maladies&&r.maladies[0];if(!m)return;const t=`${STAT[r.statut]?STAT[r.statut][0]:"Résultat incertain"} : ${m.nom}. Consultez un technicien agricole avant tout traitement.`;if(!("speechSynthesis"in window))return toast("Lecture non supportée.");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";speechSynthesis.speak(u)}
+async function shrink(f){const i=await loadImg(f),k=Math.min(1,1280/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);c.getContext("2d").drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(i.src);
+return new Promise((ok,ko)=>c.toBlob(b=>b?ok(b):ko(new Error("image")),"image/jpeg",.82))}
+let SYNCING=false;
+async function sync(){if(SYNCING)return;SYNCING=true;try{await syncQ()}finally{SYNCING=false}}
+async function syncQ(){const q=S.get("q",[]);
+if(!CFG.API){if(q.some(i=>i.st==="attente"))$("res").innerHTML+='<div class="warn"><b>Moteur IA non connecté</b> : renseignez l’adresse du serveur (Admin → Serveur). Les photos restent sur ce téléphone en attendant.</div>';return}
+if(!navigator.onLine)return;
+if(iaLogin()){if(q.some(i=>i.st==="attente"))$("res").innerHTML+='<div class="warn">Connectez-vous à votre compte pour analyser : vos photos restent en attente.<button class="btn g" onclick="go(\'compte\')">🔐 Se connecter</button></div>';return}
+for(const it of q){if(it.st!=="attente")continue;const fs=await pget(it.id);if(!fs)continue;try{const fd=new FormData();for(const [n,f] of fs.slice(0,4).entries())fd.append("images",await shrink(f),"photo"+n+".jpg");["c","o","v","sy"].forEach(k=>fd.append({c:"culture",o:"organe",v:"village",sy:"symptomes"}[k],it[k]||""));
+fd.append("lang",$("lang").value);fd.append("meteo",JSON.stringify(window.WX||null));setP(60,"Analyse par le serveur…");const r=await fetch(CFG.API+"/diagnostics",{method:"POST",body:fd,headers:H()});if(!r.ok)throw await iaErr(r);it.r=await r.json();it.st="analysé";const cur=S.get("q",[]),k=cur.findIndex(x=>x.id===it.id);if(k>=0)cur[k]=it;S.set("q",cur);showRes(it.r,it.id);setP(100,"Rapport prêt")}catch(e){setP(0,"");const m=typeof e==="string"?e:"Analyse échouée, nouvel essai à la reconnexion.";$("res").innerHTML+='<div class="warn err">'+esc(m)+'</div>';toast(m);break}}
+renderQ()}
+function renderQ(){const q=S.get("q",[]);$("queue").innerHTML=q.length?q.map(i=>`<div>• ${esc(i.c)} (${esc(i.o)}) ${esc(i.v||"")} — ${esc(i.d)} — ${i.st==="analysé"?esc(STAT[i.r&&i.r.statut]?STAT[i.r.statut][0]:"incertain")+` <button class="btn s o" onclick="showRes(S.get('q',[]).find(x=>x.id==${i.id}).r,${i.id});go('diag')">Voir</button>`:"en attente"}</div>`).join(""):"Aucune photo."}
+function net(){$("net").textContent=navigator.onLine?"En ligne":"Hors ligne"}
+addEventListener("online",()=>{net();sync()});addEventListener("offline",net);
+function saveAPI(){CFG.API=($("s-api").value.trim()||IA_URL).replace(/\/$/,"");$("s-api").value=CFG.API;CFG.TOKEN=$("s-tok").value.trim()||null;S.set("api",CFG.API===IA_URL?"":CFG.API);S.set("tok",CFG.TOKEN);toast("Serveur enregistré.");eng()}
+async function health(){try{const r=await fetch(CFG.API+"/health");const j=await r.json();$("s-out").innerHTML=`<div class="warn ok">Serveur joignable. IA : ${j.vision?"configurée":"non configurée"} · STT : ${j.stt?"oui":"non"} · TTS : ${j.tts?"oui":"non"}</div>`}catch(e){$("s-out").innerHTML='<div class="warn err">Serveur injoignable.</div>'}}
+function eng(){if(CFG.API)$("eng").innerHTML="<b>Serveur configuré.</b> Les photos sont analysées par le modèle du serveur ; chaque résultat reste une hypothèse. Toute application de produit phytosanitaire doit suivre l’étiquette et l’avis d’un agent agricole."}
+$("s-api").value=CFG.API;eng();
+async function wx(){if(!navigator.geolocation)return toast("Géolocalisation non supportée.");navigator.geolocation.getCurrentPosition(async p=>{try{const j=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.coords.latitude}&longitude=${p.coords.longitude}&current=temperature_2m,relative_humidity_2m&daily=precipitation_sum,temperature_2m_max&timezone=auto&forecast_days=5`)).json();
+window.WX={temp:j.current.temperature_2m,humidite:j.current.relative_humidity_2m,jours:j.daily.time.map((t,i)=>({date:t,tmax:j.daily.temperature_2m_max[i],pluie_mm:j.daily.precipitation_sum[i]})),nature:"prévision Open-Meteo, non observation certaine",date:new Date().toISOString()};$("wx").innerHTML=`<p>Maintenant : <b>${j.current.temperature_2m} °C</b>, humidité ${j.current.relative_humidity_2m} %</p>`+j.daily.time.map((t,i)=>`<div>${t} : max ${j.daily.temperature_2m_max[i]} °C · pluie ${j.daily.precipitation_sum[i]} mm</div>`).join("")}catch(e){toast("Météo indisponible (connexion).")}},()=>toast("Géolocalisation refusée."),{timeout:8000})}
+function hk(){try{$("h-cov").textContent=covText()}catch(e){}const q=S.get("q",[]);$("hk").innerHTML=[["Villages",V.length],["Diagnostics analysés",q.filter(i=>i.st==="analysé").length],["Photos en attente",q.filter(i=>i.st==="attente").length]].map(k=>`<div class="card">${k[0]}<div class="kpi">${k[1]}</div></div>`).join("")}
+/* Carte */
+let LM=null,LG=null,LIM=null,MK={},MAPFIT=false;
+function mapFill(fa){fillAC("f-d","f-a","f-c",!!fa)}
+async function map(){if(typeof L==="undefined"){$("lmap").innerHTML='<div class="warn err">Carte indisponible : connexion requise pour charger Leaflet.</div>';return}
+const d=$("f-d").value,a=$("f-a").value,c=$("f-c").value,on=[...document.querySelectorAll(".f:checked")].map(x=>x.value);
+if(!LM){LM=L.map("lmap",{preferCanvas:true}).setView([14.1,-15.9],9);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap"}).addTo(LM);LG=L.layerGroup().addTo(LM);LIM=L.layerGroup().addTo(LM)}
+setTimeout(()=>LM.invalidateSize(),100);LG.clearLayers();LIM.clearLayers();MK={};
+const col={"Vérifiée":"#2E8B47","À confirmer":"#F2B01E","Non disponible":"#888"},pts=[];let nv=0;
+if(on.includes("vil"))V.forEach((v,i)=>{if(v.la==null||(d&&v.d!==d)||(a&&v.a!==a)||(c&&v.c!==c))return;nv++;pts.push([v.la,v.lo]);
+MK[i]=L.circleMarker([v.la,v.lo],{radius:6,color:"#fff",weight:1,fillColor:col[v.st]||"#888",fillOpacity:.95}).addTo(LG).bindPopup(`<b>${esc(v.n)}</b><br>${esc(v.c||ND)} › ${esc(v.a||ND)} › ${esc(v.d)}<br>Statut : ${esc(v.st)}<br><button class="btn s g" onclick="openV(${i})">Ouvrir la fiche</button>`)});
+const IC={froid:"❄️",machine:"🚜"},demo=[...rooms.map(r=>({t:"froid",n:r.n,d:r.d,ll:r.ll,x:r.rest+" t libres (fictif)"})),...MACH.map(m=>({t:"machine",n:m.n,d:m.d,ll:m.ll,x:fmt(m.p)+" FCFA/jour"}))];
+demo.filter(p=>on.includes(p.t)&&(!d||p.d===d)&&!a&&!c).forEach(p=>L.marker(p.ll,{icon:L.divIcon({html:`<span style="font-size:22px">${IC[p.t]}</span>`,className:"",iconSize:[24,24]})}).addTo(LG).bindPopup(`<b>${esc(p.n)}</b><br>Dép. ${esc(p.d)}<br>${esc(p.x)}<br><i>donnée de démonstration</i><br><a target="_blank" rel="noopener" href="https://www.openstreetmap.org/directions?to=${p.ll[0]}%2C${p.ll[1]}">Itinéraire</a>`));
+let geo=null;try{geo=await pget("geo")}catch(e){}
+if(geo&&on.includes("lim")){const nvl=f=>nz((f.properties||{}).niveau||(f.properties||{}).level||"");
+L.geoJSON(geo,{style:f=>{const n=nvl(f);return{color:n.startsWith("dep")?"#0F4A2A":n.startsWith("arr")?"#2B4C7E":n.startsWith("zone")?"#A8512E":"#C9A24B",weight:n.startsWith("dep")?3:1.5,fillOpacity:n.startsWith("zone")?.15:0}},onEachFeature:(f,l)=>{const p=f.properties||{};l.bindPopup(esc(p.nom||p.name||p.NAME||"Entité")+(nvl(f)?" ("+esc(nvl(f))+")":""))}}).addTo(LIM)}
+$("leg").innerHTML=`<span style="color:#2E8B47">●</span> Vérifiée · <span style="color:#d49a00">●</span> À confirmer · <span style="color:#888">●</span> Non disponible — ${fmt(nv)} localité(s) géolocalisée(s) affichée(s) sur ${fmt(V.filter(v=>v.la!=null).length)}.<br>Limites des départements, arrondissements et zones agricoles : ${geo?"fichier officiel chargé (vert foncé = département, bleu = arrondissement, ocre = zone)":"non chargées (fichier GeoJSON officiel à importer dans Admin)"}. Infrastructures agricoles : affichées uniquement si importées et vérifiées.`;
+if(!MAPFIT&&pts.length){LM.fitBounds(pts,{padding:[20,20]});MAPFIT=true}}
+function mapFind(){const q=$("f-q").value,qn=nz(q),qf=fz(q);if(!qn)return;
+const m=(v,i)=>nz(v.n).includes(qn)||(qf.length>=3&&fz([v.n,v.al].join(" ")).includes(qf));const i=V.findIndex(m);
+if(i<0)return toast("Localité introuvable dans la base.");const v=V[i];
+if(v.la==null)return toast(v.n+" ("+(v.c||ND)+") : coordonnées GPS non disponibles.");
+$("f-d").value="";mapFill();$("f-c").value="";map().then(()=>{if(MK[i]){LM.setView([v.la,v.lo],14);MK[i].openPopup()}})}
+function locate(){if(!navigator.geolocation)return toast("Géolocalisation non supportée.");
+navigator.geolocation.getCurrentPosition(p=>{map();if(!LM)return;LM.setView([p.coords.latitude,p.coords.longitude],11);L.circleMarker([p.coords.latitude,p.coords.longitude]).addTo(LM)},()=>toast("Géolocalisation refusée."),{timeout:8000})}
+/* Producteur */
+function saveP(){const p={n:$("p-nom").value.trim(),t:$("p-tel").value.trim(),d:$("p-d").value,v:$("p-vil").value.trim(),l:$("p-l").value,u:$("p-cul").value.trim(),s:+$("p-sup").value,e:$("p-eq").value.trim(),b:$("p-bes").value.trim()};
+if(!p.n||isNaN(p.s)||p.s<0)return toast("Nom et superficie valides requis.");S.set("prof",p);toast("Profil enregistré sur ce téléphone.")}
+(()=>{const p=S.get("prof",null);if(p){$("p-nom").value=p.n;$("p-tel").value=p.t||"";$("p-d").value=p.d;$("p-vil").value=p.v||"";$("p-cul").value=p.u;$("p-sup").value=p.s;$("p-eq").value=p.e||"";$("p-bes").value=p.b||""}})();
+/* Admin */
+function ctlData(){const R=S.get("ref",null),L=R&&R.l||[];
+const k3=(n,d,c)=>nz(d)+"|"+nz(c)+"|"+nz(n),k2=(n,d)=>nz(d)+"||"+nz(n);
+const vs=new Set(V.map(vkey)),v2=new Set(V.filter(v=>!v.c).map(v=>k2(v.n,v.d))),rs=new Set(L.map(r=>k3(r[0],r[1],r[2]))),r2=new Set(L.filter(r=>!r[2]).map(r=>k2(r[0],r[1])));
+const miss=L.filter(r=>!vs.has(k3(r[0],r[1],r[2]))&&!v2.has(k2(r[0],r[1]))),extra=L.length?V.filter(v=>!rs.has(vkey(v))&&!r2.has(k2(v.n,v.d))):[];
+const matched=L.length-miss.length,cov=L.length?Math.round(matched/L.length*1000)/10:null;
+const g={},h={};V.forEach(v=>{(g[vkey(v)]=g[vkey(v)]||[]).push(v);(h[nz(v.d)+"|"+nz(v.n)]=h[nz(v.d)+"|"+nz(v.n)]||[]).push(v)});
+return{R,L,miss,extra,matched,cov,dup:Object.values(g).filter(a=>a.length>1),hom:Object.values(h).filter(a=>new Set(a.map(v=>nz(v.c))).size>1),
+nogps:V.filter(v=>v.la==null),badgps:V.filter(v=>v.la!=null&&(v.la<13||v.la>15||v.lo<-17||v.lo>-14.5)),
+badadm:V.filter(v=>!v.c||!v.a||!ADM[v.d].com.some(x=>nz(x)===nz(v.c))||!ADM[v.d].arr.some(x=>nz(x)===nz(v.a))),unconf:V.filter(v=>v.st!=="Vérifiée")}}
+function verdict(C){const R=C.R;
+if(!R||!R.l.length)return '<div class="warn err"><b>Comparaison avec le répertoire officiel ANSD non effectuée.</b> La base ne peut pas être considérée comme exhaustive. Chargez la liste officielle (« Référence officielle de comparaison ») pour lancer le contrôle.</div>';
+if(!C.miss.length&&!C.extra.length)return `<div class="warn ok"><b>Comparaison terminée avec « ${esc(R.f)} » (chargée le ${esc(R.d)}) : aucune localité manquante, aucune localité hors référence.</b> ${fmt(R.l.length)} localités concordent. Les autres contrôles ci-dessous restent à traiter.</div>`;
+return `<div class="warn err"><b>Répertoire incomplet ou non conforme :</b> ${fmt(C.miss.length)} localité(s) de la référence manquent, ${fmt(C.extra.length)} localité(s) absentes de la référence. Couverture : ${C.cov} %.</div>`}
+function ctl(C){const blk=(t,a,f,note)=>`<details class="card"><summary>${t} <span class="tag ${a.length?"c":"v"}">${fmt(a.length)}</span></summary>${note?"<small>"+note+"</small>":""}${a.slice(0,100).map(x=>"<div>• "+f(x)+"</div>").join("")||"Aucun."}${a.length>100?"<small>… "+(a.length-100)+" autres (voir l’export CSV)</small>":""}</details>`;
+const nm=v=>esc(v.n)+" — "+esc(v.c||ND)+" / "+esc(v.d),rf=r=>esc(r[0])+" — "+esc(r[2]||ND)+" / "+esc(r[1]);
+let sp=[],spNote="";if(C.miss.length&&C.extra.length){if(C.miss.length*C.extra.length<=250000){C.extra.forEach(v=>{let b=null,bd=3;const a=fz(v.n);C.miss.forEach(r=>{if(nz(r[1])!==nz(v.d))return;const z=fz(r[0]);if(Math.min(a.length,z.length)<4)return;const dd=lev(a,z);if(dd<bd){bd=dd;b=r}});if(b)sp.push([v,b])})}else spNote="Trop de différences pour chercher les fautes : traitez d’abord les manquants."}
+$("ctl").innerHTML=(C.R&&C.R.l.length?blk("Localités manquantes (dans la référence, absentes de la base)",C.miss,rf)+blk("Localités hors référence (à vérifier)",C.extra,nm)+blk("Noms possiblement mal orthographiés",sp,x=>esc(x[0].n)+" ↔ référence : "+esc(x[1][0])+" ("+esc(x[1][1])+")",spNote||"Suggestions seulement : rien n’est fusionné ou renommé automatiquement."):"")
++blk("Doublons (même nom, commune et département)",C.dup,a=>esc(a[0].n)+" ×"+a.length+" — "+esc(a[0].c||ND))
++blk("Homonymes dans des communes différentes (conservés séparés)",C.hom,a=>esc(a[0].n)+" : "+a.map(v=>esc(v.c||ND)).join(", "),"Normal : deux villages différents peuvent porter le même nom.")
++blk("Coordonnées GPS manquantes",C.nogps,nm)+blk("Coordonnées hors de la région",C.badgps,nm)
++blk("Rattachement administratif à vérifier (arrondissement ou commune absent / hors liste du département)",C.badadm,v=>nm(v)+" · arr. "+esc(v.a||ND))
++blk("Localités non confirmées",C.unconf,nm)}
+function rJr(){$("jr-out").innerHTML=JR.length?JR.map(j=>`<div>• ${esc(j.d)} — ${esc(j.f)} : ${j.n} nouvelles, ${j.u} mises à jour, ${j.dup} identiques, ${j.bad} invalides, ${j.out} hors région${j.ref?" · utilisé comme référence":""}</div>`).join(""):"Aucune mise à jour."}
+async function admin(){const C=ctlData(),na=DEPTS.reduce((s,d)=>s+ADM[d].arr.length,0),nc=DEPTS.reduce((s,d)=>s+ADM[d].com.length,0),geo=V.filter(v=>v.la!=null).length,ver=V.filter(v=>v.st==="Vérifiée").length;
+$("kpis").innerHTML=[["Départements",DEPTS.length],["Arrondissements (liste à confirmer)",na],["Communes (liste à confirmer)",nc],["Localités recensées",fmt(V.length)],["Géolocalisées",fmt(geo)],["Vérifiées",fmt(ver)],["En attente de vérification",fmt(V.length-ver)],["Taux de couverture",C.cov!==null?C.cov+" %":"n/d"],["Profils sur ce téléphone",S.get("prof",null)?1:0],["Réservations",BK().length]].map(k=>`<div class="card">${k[0]}<div class="kpi">${k[1]}</div></div>`).join("");
+const bars=a=>{const m=Math.max(1,...a.map(x=>x[1]));return a.map(x=>`<div style="margin:6px 0">${esc(x[0])} <b>${x[1]}</b><div class="bar"><i style="width:${x[1]/m*100}%"></i></div></div>`).join("")};
+$("ch1").innerHTML=bars(DEPTS.map(d=>[d,V.filter(v=>v.d===d).length]));
+$("ch2").innerHTML=bars(rooms.map(r=>[r.d,+(r.cap-r.rest).toFixed(1)]));
+$("verdict").innerHTML=verdict(C);ctl(C);rCor();rJr();
+$("ref-info").innerHTML=C.R&&C.R.l.length?`<div class="warn ok">Référence : ${esc(C.R.f)} · ${fmt(C.R.l.length)} localités · chargée le ${esc(C.R.d)}</div>`:'<div class="warn">Aucune référence chargée.</div>';
+let g=null;try{g=await pget("geo")}catch(e){}$("geo-info").innerHTML=g?'<div class="warn ok">Fichier de limites chargé.</div>':'<div class="warn">Aucun fichier de limites chargé.</div>'}
+
+/* ---- Diagnostic avancé, sol, économie, assistant ---- */
+function setP(p,t){$("prog").style.display=p?"block":"none";$("pb").style.width=p+"%";$("pt").textContent=t}
+$("s-cu").innerHTML=CULT.map(c=>`<option>${c}</option>`).join("");
+const exb=r=>{const b=(t,v)=>v&&(!Array.isArray(v)||v.length)?`<details class="card" open><summary>${t}</summary>${Array.isArray(v)?ul(v):"<p>"+esc(v)+"</p>"}</details>`:"";
+return b("Autres causes possibles",r.autres_causes)+b("Informations manquantes",r.infos_manquantes)+b("Surveillance conseillée",r.surveillance)+b("Quand demander un agronome",r.quand_expert)+b("Limites de l’analyse",r.limites)+`<small>Diagnostic du ${esc(r.date||new Date().toLocaleDateString("fr-FR"))} · modèle : ${esc(r.modele||ND)}</small><br>`};
+function speakTxt(t){if(!t)return;if($("lang").value!=="fr")return toast("Lecture vocale validée en français seulement pour l’instant.");if(!("speechSynthesis"in window))return toast("Lecture non supportée.");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";speechSynthesis.speak(u)}
+function speakRes(){const r=window.LASTRES,m=r&&r.maladies&&r.maladies[0];if(!m)return toast("Aucun problème à lire.");speakTxt(`${(STAT[r.statut]||STAT.incertain)[0]} : ${m.nom}. Gravité estimée : ${m.gravite||"inconnue"}. ${(m.mesures_immediates||[]).slice(0,3).join(". ")}. Ceci est une hypothèse. Consultez un technicien agricole avant tout traitement.`)}
+function summ(){const r=window.LASTRES||{};return `GAYNAKO AI — ${r.culture||""} — ${(STAT[r.statut]||["incertain"])[0]} : `+(r.maladies||[]).map(m=>m.nom+" ("+Math.round((m.confiance||0)*100)+" %)").join(", ")}
+function expert(){const t=summ()+"\nHypothèse non confirmée : à vérifier sur le terrain.";if(navigator.share)navigator.share({title:"Diagnostic GAYNAKO AI",text:t}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(t);toast("Résumé copié : envoyez-le à votre agent agricole.")}}
+function follow(id){const q=S.get("q",[]),it=q.find(x=>x.id==id);if(!it)return;const t=prompt("Note de suivi (traitement appliqué, évolution observée…)");if(!t)return toast("Diagnostic déjà gardé dans l’historique.");(it.f=it.f||[]).push({d:new Date().toLocaleString("fr-FR"),t});S.set("q",q);renderQ();toast("Note enregistrée.")}
+async function cmp(id){const q=S.get("q",[]),k=q.findIndex(x=>x.id==id),a=q[k],b=q.slice(k+1).find(x=>x.c===a.c&&x.v===a.v);if(!b)return $("cmp").innerHTML='<div class="warn">Aucune observation précédente pour cette culture et ce village.</div>';
+const [fa,fb]=[await pget(a.id),await pget(b.id)];$("cmp").innerHTML=`<div class="grid"><div><small>Avant : ${esc(b.d)}</small>${fb&&fb[0]?`<img style="width:100%;border-radius:10px" src="${URL.createObjectURL(fb[0])}">`:""}</div><div><small>Maintenant : ${esc(a.d)}</small>${fa&&fa[0]?`<img style="width:100%;border-radius:10px" src="${URL.createObjectURL(fa[0])}">`:""}</div></div><div class="warn">Comparaison visuelle seulement : l’évolution n’est pas mesurée automatiquement.</div>`}
+function renderQ(){const q=S.get("q",[]);$("queue").innerHTML=q.length?q.map(i=>`<div style="margin:6px 0">• ${esc(i.c)} (${esc(i.o)}) ${esc(i.v||"")} — ${esc(i.d)} — ${i.st==="analysé"?esc(STAT[i.r&&i.r.statut]?STAT[i.r.statut][0]:"incertain")+` <button class="btn s o" onclick="showRes(S.get('q',[]).find(x=>x.id==${i.id}).r,${i.id});go('diag')">Voir</button>`:"en attente"}${(i.f||[]).map(f=>`<br><small>📝 ${esc(f.d)} : ${esc(f.t)}</small>`).join("")}</div>`).join(""):"Aucune photo."}
+async function eng(){const e=$("eng");if(!CFG.API){e.className="warn err";e.innerHTML="<b>Moteur IA non connecté.</b> Renseignez l’adresse du serveur (Admin → Serveur). Aucune analyse n’est simulée : les photos restent en attente sur ce téléphone.";return}
+try{const j=await(await fetch(CFG.API+"/health")).json();IA_OK=!!j.llm;e.className="warn "+(j.vision?"ok":"err");e.innerHTML=`<b>Serveur joignable.</b> Vision : ${j.vision?"✅":"❌ clé API manquante"} · Assistant : ${j.llm?"✅":"❌"} · Reconnaissance vocale : ${j.stt?"✅":"❌"} · Voix : ${j.tts?"✅":"❌"} · Fiches de connaissances : ${j.fiches??0}. Chaque résultat reste une hypothèse.`+(CFG.API===IA_URL?" Un compte connecté est nécessaire. Les photos, questions et enregistrements sont envoyés au service d’IA "+(j.fournisseur||"externe")+".":"")}catch(x){IA_OK=false;e.className="warn err";e.innerHTML="<b>Serveur injoignable.</b> Les photos restent en attente."}}
+let CH=S.get("chat",[]);
+function rChat(){$("chat").innerHTML=CH.slice(-10).map(m=>`<div class="warn ${m.r==="u"?"":"ok"}"><b>${m.r==="u"?"Vous":"GAYNAKO"} :</b> ${esc(m.t)}</div>`).join("")}
+function aiCtx(x){const p=S.get("prof",null);return{profil:p?{departement:p.d,village:p.v,cultures:p.u,superficie_ha:p.s}:null,meteo:window.WX||null,...(x||{})}}
+async function ask(){const t=$("q-in").value.trim();if(!t)return;if(iaLogin()){toast("Connectez-vous pour interroger l’IA.");return go("compte")}const hist=CH.slice(-8).map(m=>({role:m.r==="u"?"user":"assistant",content:m.t}));CH.push({r:"u",t});$("q-in").value="";rChat();$("chat-st").textContent="Réponse en cours…";
+try{const r=await fetch(CFG.API+"/assistant",{method:"POST",headers:{...H(),"Content-Type":"application/json"},body:JSON.stringify({message:t,lang:$("lang").value,history:hist,context:aiCtx(window.CTX)})});if(!r.ok)throw await iaErr(r);const j=await r.json();window.CTX=null;CH.push({r:"a",t:j.answer});$("chat-st").textContent=j.note||""}catch(e){CH.push({r:"a",t:typeof e==="string"?e:"Assistant indisponible pour le moment."});$("chat-st").textContent=""}S.set("chat",CH.slice(-30));rChat()}
+function askAbout(){const r=window.LASTRES||{};window.CTX={diagnostic:{culture:r.culture,statut:r.statut,maladies:(r.maladies||[]).map(m=>({nom:m.nom,confiance:m.confiance}))}};go("voix");$("q-in").value="Explique-moi ce diagnostic simplement et dis-moi ce que je dois vérifier dans mon champ.";$("q-in").focus()}
+async function listenServer(){if(REC){REC.stop();return}
+try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),ch=[];REC=new MediaRecorder(st);const mt=REC.mimeType||"audio/webm";REC.ondataavailable=e=>ch.push(e.data);$("mic").classList.add("rec");
+REC.onstop=async()=>{st.getTracks().forEach(t=>t.stop());REC=null;$("mic").classList.remove("rec");const fd=new FormData();try{fd.append("audio",await toWav(new Blob(ch,{type:mt})),"q.wav")}catch(e){return toast("Enregistrement illisible, réessayez.")}$("heard").textContent="Réponse en cours…";fd.append("lang",$("lang").value);fd.append("context",JSON.stringify(aiCtx()));
+try{const r=await fetch(CFG.API+"/assistant/audio",{method:"POST",body:fd,headers:H()}),j=await r.json();if(!r.ok){$("heard").textContent=j.error||"Assistant vocal indisponible.";return}
+$("heard").innerHTML="<b>Vous :</b> "+esc(j.transcript)+"<br><b>GAYNAKO :</b> "+esc(j.answer)+(j.note?"<br><i>"+esc(j.note)+"</i>":"");if(j.audio_b64){window.LA=new Audio("data:"+j.audio_mime+";base64,"+j.audio_b64);window.LA.play()}else if($("lang").value==="fr")speakTxt(j.answer)}catch(e){toast("Assistant indisponible.")}};REC.start();const cur=REC;setTimeout(()=>{if(REC===cur)cur.stop()},60000);toast("Parlez, puis touchez à nouveau le micro.")}catch(e){toast("Micro refusé.")}}
+/* convertit l'enregistrement en WAV 16 kHz mono, lisible par l'IA sur tous les téléphones */
+async function toWav(blob){const C=window.AudioContext||window.webkitAudioContext,c=new C(),a=await c.decodeAudioData(await blob.arrayBuffer());c.close();
+const o=new OfflineAudioContext(1,Math.max(1,Math.ceil(Math.min(a.duration,60)*16000)),16000),s=o.createBufferSource();s.buffer=a;s.connect(o.destination);s.start();
+const d=(await o.startRendering()).getChannelData(0),v=new DataView(new ArrayBuffer(44+d.length*2)),t=(p,x)=>[...x].forEach((ch,i)=>v.setUint8(p+i,ch.charCodeAt(0)));
+t(0,"RIFF");v.setUint32(4,36+d.length*2,true);t(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,16000,true);v.setUint32(28,32000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);t(36,"data");v.setUint32(40,d.length*2,true);
+d.forEach((x,i)=>v.setInt16(44+i*2,Math.max(-1,Math.min(1,x))*32767,true));return new Blob([v.buffer],{type:"audio/wav"})}
+function soil(){const g=i=>$(i).value.trim(),ph=parseFloat(g("s-ph")),ce=parseFloat(g("s-ce")),o=[];
+if(!isNaN(ph))o.push(["pH "+ph,ph<5.5?"Acide : carences possibles, chaulage à étudier avec un agent.":ph<6.5?"Légèrement acide.":ph<=7.5?"Proche de la neutralité.":ph<=8.5?"Alcalin : blocage possible du phosphore et de certains oligo-éléments.":"Très alcalin : sol possiblement sodique, avis d’un expert."]);
+if(!isNaN(ce)){const m=g("s-cm");o.push(["CE "+ce+" dS/m",m==="sat"?(ce<2?"Non salin.":ce<4?"Très légèrement salin : cultures sensibles touchées.":ce<8?"Modérément salin : choisir des cultures tolérantes.":ce<16?"Fortement salin : la plupart des cultures souffrent.":"Très fortement salin."):"Classement impossible sans la méthode « pâte saturée » : les seuils de salinité ne s’appliquent pas à d’autres méthodes."])}
+$("s-res").innerHTML=(o.length?o.map(x=>`<div class="warn"><b>${esc(x[0])}</b><br>${esc(x[1])}</div>`).join(""):'<div class="warn">Saisissez au moins le pH ou la CE.</div>')+'<div class="warn">Azote, phosphore, potassium, matière organique : leur interprétation dépend de la méthode du laboratoire et de la culture. Utilisez l’IA pour une explication, à valider avec un agent.</div><button class="btn o" onclick="soilAI()">💬 Expliquer avec l’IA</button>'}
+function soilAI(){window.CTX={analyse_sol:{culture:$("s-cu").value,ph:$("s-ph").value,ce:$("s-ce").value,ce_methode:$("s-cm").value,mo_pct:$("s-mo").value,n:$("s-n").value,p:$("s-p").value,k:$("s-k").value,texture:$("s-tx").value,labo:$("s-lm").value}};go("voix");$("q-in").value="Explique mes résultats d’analyse de sol en langage simple et propose des actions adaptées à ma culture et à Kaolack.";$("q-in").focus()}
+function eco(){const n=i=>+$(i).value||0,ha=n("e-ha");if(!(ha>0))return toast("Indiquez la superficie.");
+const c=ha*(n("e-sk")*n("e-sp")+n("e-ek")*n("e-ep"))+n("e-mo")+n("e-au"),rec=ha*n("e-rd")*n("e-pv"),row=(a,b)=>`<tr><td>${a}</td><td><b>${b}</b></td></tr>`;
+$("e-res").innerHTML=`<table style="width:100%">${row("Coût total estimé",fmt(Math.round(c))+" FCFA")}${row("Recette espérée",fmt(Math.round(rec))+" FCFA")}${row("Marge (hypothèse)",fmt(Math.round(rec-c))+" FCFA")}${row("Marge si rendement −30 %",fmt(Math.round(rec*.7-c))+" FCFA")}${n("e-pv")>0?row("Rendement minimal pour couvrir les coûts",fmt(Math.round(c/(ha*n("e-pv"))))+" kg/ha"):""}${n("e-rd")>0?row("Prix minimal pour couvrir les coûts",fmt(Math.round(c/(ha*n("e-rd"))))+" FCFA/kg"):""}</table><div class="warn">Hypothèses : uniquement vos chiffres. Pertes, aléas climatiques, crédit et transport non inclus. Aucun bénéfice n’est garanti. Besoins en eau : non calculés ici (dépendent de la culture, du sol et de la saison : demandez à l’assistant).</div>`}
+function addDep(){const l=$("d-l").value.trim(),m=+$("d-m").value;if(!l||!(m>0))return toast("Libellé et montant requis.");const d=S.get("dep",[]);d.unshift({l,m,d:new Date().toLocaleDateString("fr-FR")});S.set("dep",d);rDep()}
+function rDep(){const d=S.get("dep",[]);$("d-out").innerHTML=d.map(x=>`<div>• ${esc(x.d)} ${esc(x.l)} : ${fmt(x.m)} FCFA</div>`).join("")+`<b>Total : ${fmt(d.reduce((a,x)=>a+x.m,0))} FCFA</b>`}
+rDep();rChat();
+renderRooms();renderM();renderQ();net();fillAR();fillDL();vlist(true);mapFill();go("accueil");
+if(!S.get("lang",null))$("wl").style.display="flex";else setLang(S.get("lang","fr"));
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+/* ===== Comptes clients, réservations suivies, administration, paiement Wave ===== */
+const WAVE_IMG="data:image/png;base64,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",WAVE_LINK="https://pay.wave.com/m/M_sn_pVeQfRD1dvEU/c/sn/?src=p",WAVE_NUM="775797629";
+/* ===== Supabase : connexion, données partagées ===== */
+const SB_URL="https://hjrilpeelopzguwgulze.supabase.co",SB_KEY="sb_publishable_pPKzovPjV4y8V6aweTTwqg_y-0pcsVf";
+const sb=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
+/* Fonction « image » hébergée sur un autre projet Supabase (clé publique, sans compte requis côté serveur) */
+const sbImg=window.supabase?window.supabase.createClient("https://lnzwkevogfkbsivnfnob.supabase.co","sb_publishable_DIO-ZtWNOD-w0gkeJB0yDQ_7kbWEY7t",{auth:{persistSession:false,autoRefreshToken:false}}):null;
+const REDIR=location.protocol.startsWith("http")?location.origin+location.pathname:undefined;
+const NOSB="Connexion internet nécessaire (service en ligne indisponible). Rechargez la page une fois connecté.";
+const DB={uid:null,email:"",me:null,admin:false,loaded:false,err:"",users:[],bk:[],notifs:[],cor:[]};
+const today=()=>new Date().toISOString().slice(0,10),nowS=()=>new Date().toLocaleString("fr-FR"),fdate=t=>t?new Date(t).toLocaleString("fr-FR"):"",
+digits=t=>String(t||"").replace(/\D/g,"").replace(/^221(?=\d{9}$)/,""),
+fmtTel=t=>{const d=digits(t);return d.length===9?d.replace(/(\d{2})(\d{3})(\d{2})(\d{2})/,"$1 $2 $3 $4"):String(t||"")},
+U=()=>DB.users,BK=()=>DB.bk,NT=()=>DB.notifs,
+STCL={"En attente":"","Confirmée":"v","Refusée":"c","Annulée":"c","Terminée":"n"},
+tag=s=>`<span class="tag ${STCL[s]||""}">${esc(s)}</span>`;
+function cp(t){try{navigator.clipboard.writeText(t).then(()=>toast("Copié : "+t),()=>toast("Numéro : "+t))}catch(e){toast("Numéro : "+t)}}
+function osm(la,lo){return `https://www.openstreetmap.org/?mlat=${+la}&mlon=${+lo}#map=13/${+la}/${+lo}`}
+function me(){return DB.me&&DB.me.actif!==false?DB.me:null}
+function pwOk(p){return p.length>=8&&/[A-Za-z]/.test(p)&&/\d/.test(p)}
+function errTxt(e){const m=String(e&&e.message||e||""),c=e&&e.code;
+if(/fetch|network|load failed/i.test(m))return NOSB;
+if(c==="invalid_credentials"||/invalid login/i.test(m))return "Identifiants incorrects.";
+if(c==="email_not_confirmed")return "Confirmez d’abord votre adresse e-mail (lien reçu par e-mail).";
+if(c==="user_already_exists"||c==="email_exists"||/already (been )?registered/i.test(m))return "Un compte existe déjà avec cet e-mail. Connectez-vous ou récupérez votre compte.";
+if(c==="weak_password")return "Mot de passe trop faible : choisissez-en un plus long.";
+if(c==="same_password")return "Le nouveau mot de passe doit être différent de l’ancien.";
+if(c==="over_email_send_rate_limit"||c==="over_request_rate_limit")return "Trop de demandes. Réessayez plus tard.";
+if(c==="email_address_not_authorized")return "L’envoi d’e-mails n’est pas encore configuré pour cette adresse. Contactez l’administrateur.";
+if(c==="email_address_invalid")return "Adresse e-mail refusée. Vérifiez-la.";
+if(/database error saving/i.test(m))return "Inscription refusée : nom d’utilisateur ou téléphone déjà utilisé, ou informations invalides.";
+return m||"Une erreur est survenue."}
+async function rpc(n,a){if(!sb)throw new Error(NOSB);const {data,error}=await sb.rpc(n,a);if(error)throw error;return data}
+let BUSY=false;
+async function act(fn,say=toast){if(BUSY)return;if(!sb)return say(NOSB);BUSY=true;try{await fn()}catch(e){say(errTxt(e))}finally{BUSY=false}}
+/* lit toutes les lignes, par pages de 1000 */
+async function allRows(q){const out=[];for(let i=0;;i+=1000){const {data,error}=await q().range(i,i+999);if(error)throw error;out.push(...data);if(data.length<1000)return out}}
+/* réaffiche sans effacer ce que l'utilisateur est en train de saisir */
+function keep(id,fn){const root=$(id),vals={},open=new Set(),f=document.activeElement,fid=f&&root.contains(f)?f.id:"";
+root.querySelectorAll("input[id],textarea[id]").forEach(e=>{if(e.type!=="checkbox"&&e.value!==e.defaultValue)vals[e.id]=e.value});
+const chk=[...root.querySelectorAll("input[type=checkbox][id]:checked")].map(e=>e.id);
+root.querySelectorAll("details[open]>summary").forEach(s=>open.add(s.textContent));fn();
+Object.entries(vals).forEach(([k,v])=>{const e=$(k);if(e)e.value=v});chk.forEach(k=>{if($(k))$(k).checked=true});
+root.querySelectorAll("details>summary").forEach(s=>{if(open.has(s.textContent))s.parentNode.open=true});if(fid&&$(fid))$(fid).focus({preventScroll:true})}
+const shown=id=>$(id).classList.contains("on");
+
+function mapU(p){return{id:p.id,prenom:p.prenom,nom:p.nom,user:p.username,naiss:p.naiss,lieuNaiss:p.lieu_naiss,email:p.email,tel:p.tel,actif:p.actif,cree:fdate(p.cree)}}
+function mapB(r,notes){return{no:r.no,uid:r.user_id,type:r.type,client:r.client,obj:r.obj,det:r.det,montant:+r.montant,statut:r.statut,pay:{mode:"Wave",statut:r.pay_statut,ref:r.pay_ref},cree:fdate(r.cree),note:notes[r.no]||"",hist:(r.hist||[]).map(h=>({d:fdate(h.d),s:h.s,par:h.par}))}}
+async function loadDispo(){const d=await rpc("disponibilites");
+rooms=d.chambres.map(c=>({id:c.id,n:c.nom,d:c.dep,cap:+c.cap,rest:+c.rest,p:c.tarif,ll:[c.lat,c.lon]}));S.set("rooms",rooms);
+MACH.splice(0,MACH.length,...d.machines.map(m=>({id:m.id,n:m.nom,d:m.dep,p:m.tarif,ll:[m.lat,m.lon]})))}
+async function loadUser(){const uid=DB.uid;if(!uid)return;
+const {data:a,error:ea}=await sb.from("admins").select("user_id").eq("user_id",uid);if(ea)throw ea;const adm=a.length>0;
+const [pr,bk,mine,forAdm,notes,cor]=await Promise.all([
+allRows(()=>{const q=sb.from("profiles").select("*").order("cree",{ascending:false}).order("id");return adm?q:q.eq("id",uid)}),
+allRows(()=>{const q=sb.from("reservations").select("*").order("cree",{ascending:false}).order("no");return adm?q:q.eq("user_id",uid)}),
+allRows(()=>sb.from("notifications").select("*").eq("user_id",uid).eq("pour_admin",false).order("id",{ascending:false}).limit(40)),
+adm?sb.from("notifications").select("*").eq("pour_admin",true).order("id",{ascending:false}).limit(25).then(r=>{if(r.error)throw r.error;return r.data}):[],
+adm?allRows(()=>sb.from("notes_admin").select("*").order("no")):[],
+adm?sb.from("corrections").select("*").order("id",{ascending:false}).limit(200).then(r=>{if(r.error)throw r.error;return r.data}):[]]);
+if(uid!==DB.uid)return;
+const nm=Object.fromEntries(notes.map(n=>[n.no,n.note])),nt=n=>({uid:n.pour_admin?"admin":n.user_id,msg:n.msg,d:fdate(n.cree),lu:n.lu});
+DB.admin=adm;DB.users=pr.map(mapU);DB.me=DB.users.find(u=>u.id===uid)||null;DB.bk=bk.map(r=>mapB(r,nm));DB.notifs=[...mine,...forAdm].map(nt);DB.cor=cor;
+S.set("admuid",adm?uid:null)}
+let SIG="",RUN=null,AGAIN=false;
+function refresh(){if(!sb){redraw();return Promise.resolve()}if(RUN){AGAIN=true;return RUN}
+RUN=(async()=>{do{AGAIN=false;let err="";
+try{await loadDispo()}catch(e){err=errTxt(e)}
+try{await loadUser();if(DB.uid)DB.loaded=true}catch(e){err=errTxt(e);if(S.get("admuid",null)===DB.uid&&DB.uid)DB.admin=true}
+DB.err=err;const s=JSON.stringify([DB,rooms,MACH]);if(s!==SIG){SIG=s;redraw()}}while(AGAIN)})().finally(()=>RUN=null);return RUN}
+function redraw(){if(VADM!==isAdm()){VADM=isAdm();vlist()}const rs=$("r-room").value,ms=$("m-sel").value;renderRooms();renderM();
+if(rs)$("r-room").value=rs;if(ms)$("m-sel").value=ms;rInfo();mInfo();cost();bkBox();
+if(shown("compte"))keep("compte",renderAcc);if(shown("admin"))keep("admin",admShow)}
+
+/* ---- Wave ---- */
+function waveCard(amt,no){return `<div class="card" style="text-align:center;border:2px solid #1DC8FF;margin:8px 0"><h3>💙 Payer avec Wave</h3>${amt?`<p>Montant à payer : <b>${fmt(amt)} FCFA</b></p>`:""}${no?`<p>Indiquez le numéro <b>${esc(no)}</b> dans le motif.</p>`:""}
+<img src="${WAVE_IMG}" alt="QR code Wave à scanner" style="max-width:230px;width:100%;border-radius:14px">
+<a class="btn g" href="${WAVE_LINK}" target="_blank" rel="noopener">Ouvrir Wave et payer</a>
+<p>Ou envoyez au numéro Wave : <b>${fmtTel(WAVE_NUM)}</b></p>
+<button class="btn o" onclick="cp('${WAVE_NUM}')">📋 Copier le numéro</button><a class="btn o" href="tel:+221${WAVE_NUM}">📞 Appeler ${fmtTel(WAVE_NUM)}</a>
+<a class="btn o" href="https://wa.me/221${WAVE_NUM}" target="_blank" rel="noopener">💬 WhatsApp</a></div>`}
+const waveBox=()=>`<details class="card" style="margin-top:12px"><summary>💙 Payer avec Wave (QR code ou ${fmtTel(WAVE_NUM)})</summary>${waveCard()}</details>`;
+
+/* ---- Objet réservé : infos et coordonnées ---- */
+function objCard(o){return `<div class="warn ok">📍 <b>${esc(o.nom)}</b> — ${esc(o.dep)}<br>Coordonnées GPS : <a href="${osm(o.lat,o.lon)}" target="_blank" rel="noopener">${+o.lat}, ${+o.lon}</a> (ouvrir la carte)<br>Tarif : ${esc(o.tarif)}${o.extra?"<br>"+esc(o.extra):""}</div>`}
+function rInfo(){const r=rooms.find(x=>x.id==$("r-room").value);$("r-info").innerHTML=r?objCard({nom:r.n,dep:r.d,lat:r.ll[0],lon:r.ll[1],tarif:r.p+" FCFA/kg/jour",extra:r.rest+" t libres sur "+r.cap+" t"}):""}
+function mInfo(){const m=MACH.find(x=>x.id==$("m-sel").value);$("m-info").innerHTML=m?objCard({nom:m.n,dep:m.d,lat:m.ll[0],lon:m.ll[1],tarif:fmt(m.p)+" FCFA/jour"}):""}
+function bkBox(){const u=me(),h=u?`<div class="warn ok">✅ Réservation au nom de <b>${esc(u.prenom)} ${esc(u.nom)}</b><br>📞 ${esc(fmtTel(u.tel))} · 📧 ${esc(u.email)}</div>`:`<div class="warn err"><b>Compte requis.</b> Créez un compte ou connectez-vous pour réserver.<button class="btn g" onclick="go('compte')">🔐 Se connecter / Créer un compte</button></div>`;$("r-who").innerHTML=h;$("m-who").innerHTML=h}
+function myHist(id,type){const L=BK().filter(b=>b.uid===DB.uid&&b.type===type);$(id).innerHTML=L.map(b=>`<div style="margin:4px 0">• <b>${esc(b.no)}</b> ${tag(b.statut)} ${esc(b.obj.nom)} — ${detTxt(b)}</div>`).join("")||(DB.uid?"Aucune demande.":"Connectez-vous pour voir vos demandes.")}
+{const a=renderRooms,b=renderM;renderRooms=function(){a();myHist("r-hist","froid");rInfo();bkBox()};renderM=function(){b();myHist("m-hist","machine");mInfo();bkBox()}}
+$("r-room").addEventListener("change",rInfo);$("m-sel").addEventListener("change",mInfo);
+
+/* ---- Réservations ---- */
+function detTxt(b){const d=b.det;return b.type==="froid"?`${esc(d.categorie)} · ${+d.kg} kg · à partir du ${esc(d.date)} · ${+d.jours} jour(s)`:`Date : ${esc(d.date)} · ${+d.jours} jour(s) · ${+d.n} producteur(s) · coût total ${fmt(+d.total)} FCFA`}
+function bkInfo(b){const o=b.obj;return `📍 <b>${esc(o.nom)}</b> — ${esc(o.dep)} · GPS <a href="${osm(o.lat,o.lon)}" target="_blank" rel="noopener">${+o.lat}, ${+o.lon}</a><br>📦 ${detTxt(b)}<br>💰 À payer : <b>${fmt(b.montant)} FCFA</b> · Paiement ${esc(b.pay.mode)} : <b>${esc(b.pay.statut)}</b>${b.pay.ref?" (réf. "+esc(b.pay.ref)+")":""}<br>🕒 Créée le ${esc(b.cree)}`}
+function payBox(b,ctx){if(b.pay.statut.startsWith("Reçu")||["Refusée","Annulée"].includes(b.statut))return "";
+return `<details style="margin-top:6px"><summary>💙 Payer avec Wave (${esc(b.no)})</summary>${waveCard(b.montant,b.no)}<input id="pr-${ctx}-${esc(b.no)}" maxlength="60" placeholder="Référence / numéro de transaction Wave"><button class="btn g" onclick="payDecl('${esc(b.no)}','${ctx}')">J’ai payé</button><small>Le paiement est vérifié par l’administrateur avant d’être validé.</small></details>`}
+function payDecl(no,ctx){const r=($("pr-"+ctx+"-"+no).value||"").trim();if(r.length<4)return toast("Saisissez la référence de la transaction Wave.");
+return act(async()=>{await rpc("declarer_paiement",{p_no:no,p_ref:r});$("r-rec").innerHTML="";$("m-rec").innerHTML="";await refresh();toast("Paiement déclaré. L’administrateur va vérifier.")})}
+function showRec(id,b){$(id).innerHTML=`<div class="card" style="margin-top:12px;border:2px solid var(--g2)"><h3>✅ Demande de réservation reçue</h3><p>N° <b>${esc(b.no)}</b> — ${tag(b.statut)}<br>Elle sera confirmée par l’administrateur après vérification. Aucune confirmation automatique.</p>${bkInfo(b)}${payBox(b,"rec")}<button class="btn o" onclick="go('compte')">Voir mes réservations</button></div>`}
+function needAcc(){if(me())return false;toast(sb?"Connectez-vous pour réserver.":NOSB);go("compte");return true}
+function bookRoom(){if(needAcc())return;
+const r=rooms.find(x=>x.id==$("r-room").value),kg=+$("r-kg").value,d=$("r-date").value,j=+$("r-days").value;
+if(!r||!(kg>0)||!d||!(j>0)||!Number.isInteger(j))return toast("Remplissez quantité, date et durée (jours entiers).");
+if(d<today())return toast("La date ne peut pas être passée.");
+return act(async()=>{const x=await rpc("reserver_chambre",{p_chambre:r.id,p_kg:kg,p_categorie:$("r-cat").value,p_date:d,p_jours:j});$("r-kg").value="";await refresh();showRec("r-rec",mapB(x,{}));toast("Demande enregistrée : en attente de validation.")})}
+function bookM(){if(needAcc())return;
+const m=MACH.find(x=>x.id==$("m-sel").value),d=$("m-date").value,j=+$("m-days").value||1,n=+$("m-n").value||1;
+if(!d)return toast("Choisissez une date.");if(d<today())return toast("La date ne peut pas être passée.");
+if(!Number.isInteger(j)||!Number.isInteger(n)||j<1||n<1)return toast("Jours et producteurs : nombres entiers positifs.");
+return act(async()=>{const x=await rpc("reserver_machine",{p_machine:m.id,p_date:d,p_jours:j,p_n:n});await refresh();showRec("m-rec",mapB(x,{}));toast("Demande enregistrée : en attente de validation.")})}
+function setSt(no,s){return act(async()=>{await rpc("changer_statut",{p_no:no,p_statut:s});$("r-rec").innerHTML="";$("m-rec").innerHTML="";await refresh();toast("Statut : "+s)})}
+function setPay(no){return act(async()=>{await rpc("admin_paiement_recu",{p_no:no});await refresh();toast("Paiement marqué reçu.")})}
+function saveNote(no){const t=$("nt-"+no).value.trim();return act(async()=>{await rpc("admin_note",{p_no:no,p_note:t});await refresh();toast("Note enregistrée.")})}
+
+/* ---- Compte client ---- */
+let AV="login",START=false; /* START : écran de compte affiché à l'ouverture */
+const skipBtn=`<button class="btn s o" onclick="go('accueil')">Continuer sans compte →</button>`;
+function accMsg(t){const e=$("acc-msg");e.textContent=t;e.hidden=false;toast(t)}
+function accView(v){AV=v;renderAcc()}
+const F=(i,l,a,extra="")=>`<label for="${i}">${l}</label><input id="${i}" ${a} ${extra}>`;
+function formLogin(){return `<div class="card"><h3>🔐 Connexion</h3>${F("lg-id","Nom d’utilisateur, e-mail ou téléphone",'autocomplete="username" autocapitalize="none"')}${F("lg-pw","Mot de passe",'type="password" autocomplete="current-password"')}
+<button class="btn g" onclick="doLogin()">Se connecter</button><button class="btn o" onclick="accView('register')">Créer un compte</button><button class="btn o" onclick="accView('recover')">Mot de passe oublié ?</button>${skipBtn}</div>`}
+const profFields=(p,u={})=>`${F(p+"-pre","Prénom *",`maxlength="60" autocomplete="given-name" value="${esc(u.prenom||"")}"`)}${F(p+"-nom","Nom *",`maxlength="60" autocomplete="family-name" value="${esc(u.nom||"")}"`)}${F(p+"-dn","Date de naissance *",`type="date" autocomplete="bday" value="${esc(u.naiss||"")}"`)}${F(p+"-ln","Lieu de naissance *",`maxlength="80" placeholder="Ville / village" value="${esc(u.lieuNaiss||"")}"`)}
+${F(p+"-user","Nom d’utilisateur * (3 à 20 : lettres, chiffres, . _ -)",`autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="ex. mamadou221" value="${esc(u.user||"")}"`)}`;
+function formReg(){return `<div class="card"><h3>📝 Créer mon compte</h3>${profFields("rg")}${F("rg-mail","Adresse e-mail *",'type="email" autocomplete="email"')}${F("rg-tel","Numéro de téléphone *",'type="tel" autocomplete="tel" placeholder="77 579 76 29"')}
+${F("rg-pw","Mot de passe * (8 caractères min., lettres et chiffres)",'type="password" autocomplete="new-password"')}${F("rg-pw2","Confirmer le mot de passe *",'type="password" autocomplete="new-password"')}
+<label style="display:flex;gap:8px;align-items:flex-start;margin:8px 0"><input id="rg-cgu" type="checkbox" style="width:auto;margin-top:4px"> J’accepte les conditions d’utilisation et la politique de confidentialité. Mes informations servent uniquement à gérer mes réservations.</label>
+<button class="btn g" onclick="doReg()">Créer mon compte</button><button class="btn o" onclick="accView('login')">J’ai déjà un compte</button>
+<small>Un lien de confirmation peut vous être envoyé par e-mail.</small><br>${skipBtn}</div>`}
+function formRec(){return `<div class="card"><h3>🔑 Mot de passe oublié</h3><p>Saisissez votre adresse e-mail : vous recevrez un lien pour choisir un nouveau mot de passe.</p>${F("rc-mail","Adresse e-mail",'type="email" autocomplete="email"')}<button class="btn g" onclick="doRec()">Recevoir le lien</button><button class="btn o" onclick="accView('login')">Retour</button></div>`}
+function formNewPw(){return `<div class="card"><h3>🔑 Nouveau mot de passe</h3>${F("np-pw","Nouveau mot de passe",'type="password" autocomplete="new-password"')}${F("np-pw2","Confirmer",'type="password" autocomplete="new-password"')}<button class="btn g" onclick="doNewPw()">Enregistrer</button></div>`}
+/* lit et contrôle les champs communs d'un profil */
+function readProf(p,tel){const v=i=>$(p+i).value.trim(),x={prenom:v("-pre"),nom:v("-nom"),naiss:$(p+"-dn").value,lieu:v("-ln"),user:v("-user").toLowerCase(),tel:digits(tel)};
+if(Object.values(x).some(k=>!k))return "Tous les champs sont obligatoires.";
+if(!/^[a-z0-9._-]{3,20}$/.test(x.user))return "Nom d’utilisateur : 3 à 20 caractères (lettres, chiffres, point, tiret, underscore), sans espace.";
+if(x.tel.length<9||x.tel.length>12)return "Numéro de téléphone invalide (ex. 77 579 76 29).";
+if(x.naiss>=today()||x.naiss<"1900-01-01")return "Date de naissance invalide.";return x}
+const mailOk=m=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m);
+async function checkFree(x){const k=await rpc("verifier_disponibilite",{p_username:x.user,p_tel:x.tel});
+if(k)throw new Error(k==="username"?"Ce nom d’utilisateur est déjà pris. Choisissez-en un autre.":"Un compte existe déjà avec ce téléphone. Connectez-vous ou récupérez votre compte.")}
+const profArgs=x=>({p_prenom:x.prenom,p_nom:x.nom,p_username:x.user,p_naiss:x.naiss,p_lieu:x.lieu,p_tel:x.tel});
+function doReg(){const x=readProf("rg",$("rg-tel").value),mail=$("rg-mail").value.trim().toLowerCase(),pw=$("rg-pw").value;
+if(typeof x==="string")return accMsg(x);if(!mailOk(mail))return accMsg("Adresse e-mail invalide.");
+if(!pwOk(pw))return accMsg("Mot de passe : 8 caractères minimum, avec lettres et chiffres.");
+if(pw!==$("rg-pw2").value)return accMsg("Les deux mots de passe sont différents.");
+if(!$("rg-cgu").checked)return accMsg("Acceptez les conditions d’utilisation pour continuer.");
+return act(async()=>{await checkFree(x);
+const {data,error}=await sb.auth.signUp({email:mail,password:pw,options:{emailRedirectTo:REDIR,data:{prenom:x.prenom,nom:x.nom,username:x.user,naiss:x.naiss,lieu_naiss:x.lieu,tel:x.tel}}});
+if(error)throw error;
+if(data.user&&data.user.identities&&!data.user.identities.length)throw {code:"user_already_exists"};
+if(data.session){AV="login";toast("Compte créé. Vous êtes connecté.")}
+else{accView("login");accMsg("Compte créé. Ouvrez le lien de confirmation envoyé à "+mail+", puis connectez-vous.")}},accMsg)}
+/* renvoie un message d'erreur, ou null si la connexion a réussi */
+async function signIn(id,pw){if(id.includes("@")){const {error}=await sb.auth.signInWithPassword({email:id,password:pw});return error?errTxt(error):null}
+const {data,error}=await sb.functions.invoke("connexion",{body:{identifiant:id,motdepasse:pw}});if(error)return NOSB;if(data.erreur)return data.erreur;
+const r=await sb.auth.setSession({access_token:data.access_token,refresh_token:data.refresh_token});return r.error?errTxt(r.error):null}
+function doLogin(){const id=$("lg-id").value.trim().toLowerCase(),pw=$("lg-pw").value;if(!id||!pw)return accMsg("Saisissez votre identifiant et votre mot de passe.");
+return act(async()=>{const e=await signIn(id,pw);if(e)return accMsg(e);toast("Connecté.")},accMsg)}
+function doRec(){const mail=$("rc-mail").value.trim().toLowerCase();if(!mailOk(mail))return accMsg("Adresse e-mail invalide.");
+return act(async()=>{const {error}=await sb.auth.resetPasswordForEmail(mail,{redirectTo:REDIR});if(error)throw error;accView("login");accMsg("Si un compte existe pour cette adresse, un lien vient d’être envoyé.")},accMsg)}
+function doNewPw(){const p=$("np-pw").value;if(!pwOk(p))return accMsg("Mot de passe : 8 caractères minimum, avec lettres et chiffres.");if(p!==$("np-pw2").value)return accMsg("Les deux mots de passe sont différents.");
+return act(async()=>{const {error}=await sb.auth.updateUser({password:p});if(error)throw error;accView("login");toast("Mot de passe modifié.")},accMsg)}
+function logout(){return act(async()=>{await sb.auth.signOut({scope:"local"});AV="login";toast("Déconnecté.")})}
+function saveProfile(){const x=readProf("cp",$("cp-tel").value);if(typeof x==="string")return accMsg(x);
+return act(async()=>{await checkFree(x);await rpc("enregistrer_profil",profArgs(x));await refresh();toast("Profil enregistré.")},accMsg)}
+function saveInfo(){const x=readProf("ed",$("ed-tel").value),mail=$("ed-mail").value.trim().toLowerCase();if(typeof x==="string")return accMsg(x);if(!mailOk(mail))return accMsg("Adresse e-mail invalide.");
+return act(async()=>{const old=DB.email.toLowerCase();await checkFree(x);await rpc("enregistrer_profil",profArgs(x));
+if(mail!==old){const {error}=await sb.auth.updateUser({email:mail},{emailRedirectTo:REDIR});if(error)throw error}
+await refresh();renderAcc();if(mail!==old)accMsg("Informations enregistrées. Le nouvel e-mail sera pris en compte après confirmation (liens envoyés par e-mail).");else toast("Informations enregistrées.")},accMsg)}
+function savePw(){const o=$("pw-old").value,n=$("pw-new").value;if(!pwOk(n))return accMsg("Nouveau mot de passe : 8 caractères minimum, avec lettres et chiffres.");if(n!==$("pw-new2").value)return accMsg("Les deux mots de passe sont différents.");
+return act(async()=>{const c=await sb.auth.signInWithPassword({email:DB.email,password:o});if(c.error)return accMsg("Ancien mot de passe incorrect.");
+const {error}=await sb.auth.updateUser({password:n});if(error)throw error;["pw-old","pw-new","pw-new2"].forEach(i=>$(i).value="");toast("Mot de passe modifié.")},accMsg)}
+const outBtn=`<button class="btn o" onclick="logout()">Se déconnecter</button>`;
+function renderAcc(){const o=$("acc-out");if(!o)return;$("acc-msg").hidden=true;
+if(!sb){o.innerHTML=`<div class="warn err">${NOSB}</div>`;return}
+if(AV==="newpw"&&DB.uid){o.innerHTML=formNewPw();return}
+if(!DB.uid){o.innerHTML=AV==="register"?formReg():AV==="recover"?formRec():formLogin();return}
+if(!DB.loaded){o.innerHTML=`<div class="card">${DB.err?esc(DB.err)+'<button class="btn g" onclick="refresh()">Réessayer</button>'+outBtn:"Chargement de votre compte…"}</div>`;return}
+if(!DB.me){o.innerHTML=`<div class="card"><h3>📝 Compléter mon profil</h3><p>Connecté avec ${esc(DB.email)}.</p>${profFields("cp")}${F("cp-tel","Numéro de téléphone *",'type="tel" autocomplete="tel"')}<button class="btn g" onclick="saveProfile()">Enregistrer</button>${outBtn}</div>`;return}
+const u=DB.me;if(u.actif===false){o.innerHTML=`<div class="warn err">Ce compte est désactivé. Contactez l’administrateur : ${fmtTel(WAVE_NUM)}.</div>${outBtn}`;return}
+const bk=BK().filter(b=>b.uid===u.id),nt=NT().filter(n=>n.uid===u.id),c=s=>bk.filter(b=>b.statut===s).length;
+o.innerHTML=`${DB.err?`<div class="warn err">${esc(DB.err)} Les informations affichées peuvent être anciennes.</div>`:""}<div class="card"><h3>👤 ${esc(u.prenom)} ${esc(u.nom)}</h3><p>🆔 @${esc(u.user)}<br>📧 ${esc(u.email)}<br>📞 ${esc(fmtTel(u.tel))}<br>🎂 Né(e) le ${esc(u.naiss)} à ${esc(u.lieuNaiss)}<br>🗓️ Compte créé le ${esc(u.cree)}</p>${outBtn}</div>
+<div class="grid" style="margin-top:12px">${[["En attente",c("En attente")],["Confirmées",c("Confirmée")],["Refusées / annulées",c("Refusée")+c("Annulée")],["Terminées",c("Terminée")]].map(k=>`<div class="card">${k[0]}<div class="kpi">${k[1]}</div></div>`).join("")}</div>
+<div class="card" style="margin-top:12px"><h3>📋 Mes réservations</h3>${bk.map(b=>`<div class="card" style="margin:8px 0"><b>${esc(b.no)}</b> ${tag(b.statut)} <span class="tag n">${b.type==="froid"?"❄️ Froid":"🚜 Machine"}</span><br>${bkInfo(b)}${payBox(b,"acc")}${["En attente","Confirmée"].includes(b.statut)?`<button class="btn o" onclick="if(confirm('Annuler la réservation ${esc(b.no)} ?'))setSt('${esc(b.no)}','Annulée')">Annuler cette réservation</button>`:""}</div>`).join("")||"Aucune réservation pour le moment."}
+<button class="btn g" onclick="go('froid')">❄️ Réserver une chambre froide</button><button class="btn g" onclick="go('machines')">🚜 Réserver une machine</button></div>
+<div class="card" style="margin-top:12px"><h3>🔔 Notifications</h3>${nt.slice(0,20).map(n=>`<div style="margin:4px 0">${n.lu?"":"🟢 "}<small>${esc(n.d)}</small><br>${esc(n.msg)}</div>`).join("")||"Aucune notification."}</div>
+<details class="card" style="margin-top:12px"><summary>✏️ Modifier mes informations</summary>${profFields("ed",u)}${F("ed-mail","E-mail",`type="email" value="${esc(u.email)}"`)}${F("ed-tel","Téléphone",`type="tel" value="${esc(u.tel)}"`)}<button class="btn g" onclick="saveInfo()">Enregistrer</button></details>
+<details class="card" style="margin-top:12px"><summary>🔑 Changer mon mot de passe</summary>${F("pw-old","Ancien mot de passe",'type="password" autocomplete="current-password"')}${F("pw-new","Nouveau mot de passe",'type="password" autocomplete="new-password"')}${F("pw-new2","Confirmer",'type="password" autocomplete="new-password"')}<button class="btn g" onclick="savePw()">Modifier</button></details>
+${waveBox()}`;
+if(shown("compte")&&nt.some(n=>!n.lu)){nt.forEach(n=>n.lu=true);sb.rpc("marquer_lues").then(()=>{},()=>{})}}
+
+/* ---- Administration : réservée aux comptes inscrits dans la table « admins » ---- */
+let ADMOK=false,ADN=20,CLN=20,GATE="";
+const isAdm=()=>!!(DB.uid&&DB.admin);
+function admShow(){admGate();if(ADMOK){admin();renderAdm();renderCl();renderAdNt()}}
+function admGate(){ADMOK=isAdm();$("adm-body").hidden=!ADMOK;const g=$("adm-gate");g.hidden=ADMOK;
+const k=ADMOK?"ok":!sb?"off":!DB.uid?"login":!DB.loaded?"load"+DB.err:"no"+DB.email;if(k===GATE)return;GATE=k;if(ADMOK){g.innerHTML="";return}
+g.innerHTML=!sb?`<div class="warn err">${NOSB}</div>`:!DB.uid?`<div class="card"><h3>🔒 Accès administrateur</h3>${F("ad-id","E-mail, nom d’utilisateur ou téléphone",'autocomplete="username" autocapitalize="none"')}${F("ad-pw","Mot de passe",'type="password" autocomplete="current-password"')}<button class="btn g" onclick="admLogin()">Entrer</button></div>`
+:!DB.loaded?`<div class="card">${DB.err?esc(DB.err)+'<button class="btn g" onclick="refresh()">Réessayer</button>':"Vérification des droits…"}</div>`
+:`<div class="card"><h3>🔒 Accès réservé</h3><p>Le compte ${esc(DB.email)} n’est pas administrateur.</p>${outBtn}</div>`}
+function admLogin(){const id=$("ad-id").value.trim().toLowerCase(),pw=$("ad-pw").value;if(!id||!pw)return toast("Saisissez votre identifiant et votre mot de passe.");
+return act(async()=>{const e=await signIn(id,pw);if(e)return toast(e);$("ad-pw")&&($("ad-pw").value="")})}
+function admLock(){return logout()}
+function renderAdm(){if(!ADMOK)return;const bk=BK(),us=U(),q=nz($("ad-q").value),dq=digits($("ad-q").value),s=$("ad-s").value,cnt=t=>bk.filter(b=>b.statut===t).length;
+$("ad-kpi").innerHTML=[["Clients inscrits",us.length],["Réservations",bk.length],["En attente",cnt("En attente")],["Confirmées",cnt("Confirmée")],["Refusées / annulées",cnt("Refusée")+cnt("Annulée")],["Terminées",cnt("Terminée")],["Paiements à vérifier",bk.filter(b=>b.pay.statut.startsWith("Déclaré")).length],["Paiements reçus (FCFA)",fmt(bk.filter(b=>b.pay.statut.startsWith("Reçu")).reduce((a,b)=>a+b.montant,0))]].map(k=>`<div class="card">${k[0]}<div class="kpi">${k[1]}</div></div>`).join("");
+const L=bk.filter(b=>(!s||b.statut===s)&&(!q||nz([b.no,b.client.prenom,b.client.nom,b.client.email,b.client.user||"",b.obj.nom,b.obj.dep].join(" ")).includes(q)||(dq.length>3&&digits(b.client.tel).includes(dq))));
+$("ad-list").innerHTML=(DB.err?`<div class="warn err">${esc(DB.err)}</div>`:"")+(L.slice(0,ADN).map(b=>{const c=b.client,n=esc(b.no);return `<div class="card" style="margin:8px 0"><b>${n}</b> ${tag(b.statut)} <span class="tag n">${b.type==="froid"?"❄️ Froid":"🚜 Machine"}</span>
+<p style="margin:6px 0"><b>👤 ${esc(c.prenom)} ${esc(c.nom)}</b>${c.user?" · 🆔 @"+esc(c.user):""}<br>🎂 Né(e) le ${esc(c.naiss)} à ${esc(c.lieuNaiss)}<br>📞 <a href="tel:+221${esc(c.tel)}">${esc(fmtTel(c.tel))}</a> · <a href="https://wa.me/221${esc(c.tel)}" target="_blank" rel="noopener">WhatsApp</a><br>📧 <a href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
+<p style="margin:6px 0">${bkInfo(b)}</p>
+<textarea id="nt-${n}" rows="2" maxlength="2000" placeholder="Note administrative">${esc(b.note)}</textarea>
+<button class="btn s g" onclick="setSt('${n}','Confirmée')">✅ Confirmer</button><button class="btn s o" onclick="setSt('${n}','Refusée')">❌ Refuser</button><button class="btn s o" onclick="setSt('${n}','Terminée')">🏁 Terminée</button><button class="btn s o" onclick="setSt('${n}','Annulée')">🚫 Annuler</button><button class="btn s g" onclick="setPay('${n}')">💙 Paiement reçu</button><button class="btn s o" onclick="saveNote('${n}')">💾 Note</button>
+<details><summary>Historique ${n}</summary>${b.hist.map(h=>`<div><small>${esc(h.d)} — ${esc(h.s)} (${esc(h.par)})</small></div>`).join("")}</details></div>`}).join("")||"Aucune réservation.");
+$("ad-more").style.display=L.length>ADN?"block":"none"}
+function renderCl(){if(!ADMOK)return;const q=nz($("ad-cq").value),dq=digits($("ad-cq").value),bk=BK(),L=U().filter(u=>!q||nz(u.prenom+" "+u.nom+" "+(u.user||"")+" "+u.email).includes(q)||(dq.length>3&&u.tel.includes(dq)));
+$("ad-cl").innerHTML=L.slice(0,CLN).map(u=>`<div class="card" style="margin:8px 0"><b>${esc(u.prenom)} ${esc(u.nom)}</b> · 🆔 @${esc(u.user)} ${u.actif===false?'<span class="tag c">désactivé</span>':'<span class="tag v">actif</span>'}<br>🎂 ${esc(u.naiss)} à ${esc(u.lieuNaiss)}<br>📞 <a href="tel:+221${esc(u.tel)}">${esc(fmtTel(u.tel))}</a> · 📧 ${esc(u.email)}<br>🗓️ Inscrit le ${esc(u.cree)} · ${bk.filter(b=>b.uid===u.id).length} réservation(s)
+<button class="btn s o" data-m="${esc(u.email)}" onclick="$('ad-q').value=this.dataset.m;renderAdm();$('ad-q').scrollIntoView()">Voir ses réservations</button><button class="btn s o" onclick="toggleU('${esc(u.id)}')">${u.actif===false?"Réactiver":"Désactiver"}</button></div>`).join("")||"Aucun client.";
+$("ad-cmore").style.display=L.length>CLN?"block":"none"}
+function toggleU(id){const u=U().find(x=>x.id===id);if(!u)return;return act(async()=>{await rpc("admin_activer_client",{p_user:id,p_actif:u.actif===false});await refresh()})}
+function renderAdNt(){if(!ADMOK)return;$("ad-nt").innerHTML=NT().filter(n=>n.uid==="admin").slice(0,25).map(n=>`<div style="margin:4px 0"><small>${esc(n.d)}</small><br>${esc(n.msg)}</div>`).join("")||"Aucune notification."}
+function csvBk(){if(!ADMOK)return;dl("gaynako-reservations-clients.csv",[["N°","Statut","Type","Prénom","Nom","Nom d’utilisateur","Date de naissance","Lieu de naissance","Téléphone","E-mail","Objet","Département","Latitude","Longitude","Détails","Montant FCFA","Paiement","Réf. paiement","Créée le","Note admin"],...BK().map(b=>[b.no,b.statut,b.type,b.client.prenom,b.client.nom,b.client.user||"",b.client.naiss,b.client.lieuNaiss,b.client.tel,b.client.email,b.obj.nom,b.obj.dep,b.obj.lat,b.obj.lon,detTxt(b).replace(/&[a-z#0-9]+;/g,"'"),b.montant,b.pay.statut,b.pay.ref,b.cree,b.note])])}
+/* anciennes données locales (avant Supabase) : export avant nettoyage éventuel */
+function csvOld(){const u=S.get("users",[]).map(({salt,hash,...x})=>x),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({clients:u,reservations:S.get("bk",[])},null,1)],{type:"application/json"}));a.download="gaynako-anciennes-donnees.json";a.click()}
+
+/* ---- Images IA (fonction Supabase « image », API gratuite) ---- */
+$("i-cult").innerHTML=CULT.map(c=>`<option>${c}</option>`).join("");
+const IMT={
+saine:c=>`Realistic educational photo-style illustration of a healthy, vigorous ${c} plant in a farm field in Senegal (Kaolack region), natural daylight, sharp focus, no text, no logo`,
+symp:(c,t)=>`Schematic educational agronomy illustration showing ${t||"leaf symptoms"} on a ${c} leaf, plain neutral background, textbook style, no text, no logo`,
+affiche:(c,t)=>`Colorful simple awareness poster illustration for Senegalese farmers about ${t||"good practices for growing "+c}, large pictograms, friendly flat style, no text, no letters`,
+parcelle:(c,t)=>`Wide landscape of a well-kept ${c} field in rural Senegal, sandy soil, baobab trees in the distance, golden light${t?", "+t:""}, no text`,
+marche:(c,t)=>`Fresh ${c} displayed at a busy Senegalese village market stall, colorful baskets, warm light${t?", "+t:""}, no text`,
+libre:(c,t)=>t};
+function imgErr(e){return e&&e.context&&e.context.json?e.context.json().then(j=>j.erreur).catch(()=>null):Promise.resolve(null)}
+function genImg(){if(!sb)return toast(NOSB);if(!DB.uid){toast("Connectez-vous pour générer des images.");return go("compte")}
+const k=$("i-kind").value,c=$("i-cult").value,t=$("i-p").value.trim();
+if(k==="libre"&&t.length<5)return toast("Décrivez l’image à créer.");
+if(!navigator.onLine)return toast("Connexion internet nécessaire.");
+const prompt=IMT[k](c,t).slice(0,600);
+return act(async()=>{$("i-out").innerHTML='<div class="warn">Création de l’image en cours (10 à 40 secondes)…</div>';
+const {data,error}=await sbImg.functions.invoke("image",{body:{prompt,format:$("i-fmt").value,seed:Math.floor(Math.random()*1e6)}});
+if(error||!data||data.erreur||!data.image_b64){const m=(await imgErr(error))||(data&&data.erreur)||"Service d’images indisponible pour le moment.";$("i-out").innerHTML=`<div class="warn err">${esc(m)}</div>`;return}
+const url="data:"+data.mime+";base64,"+data.image_b64,g=(await pget("imgs"))||[];
+g.unshift({d:nowS(),k:$("i-kind").options[$("i-kind").selectedIndex].text,c,url});await pput("imgs",g.slice(0,8));
+$("i-out").innerHTML=`<div class="ov" style="margin-top:8px"><img alt="Image générée par IA : ${esc(c)}" src="${url}"></div>
+<div class="warn">Image générée par IA, à titre illustratif seulement (fournisseur : ${esc(data.fournisseur||"IA gratuite")}). Elle peut contenir des erreurs.</div>
+<a class="btn g" download="gaynako-image.${data.mime.includes("png")?"png":"jpg"}" href="${url}">⬇️ Télécharger</a><button class="btn o" onclick="genImg()">🔄 Une autre version</button>`;
+imgGal()})}
+async function imgGal(){const g=(await pget("imgs"))||[];$("i-gal").innerHTML=g.length?g.map((x,i)=>`<img alt="${esc(x.k)}" src="${x.url}" onclick="showImg(${i})" style="cursor:pointer">`).join(""):"<small>Aucune image pour le moment.</small>"}
+async function showImg(i){const x=((await pget("imgs"))||[])[i];if(!x)return;$("i-out").innerHTML=`<div class="ov" style="margin-top:8px"><img alt="${esc(x.k)}" src="${x.url}"></div><small>${esc(x.k)} · ${esc(x.c)} · ${esc(x.d)}</small><br><a class="btn g" download="gaynako-image.png" href="${x.url}">⬇️ Télécharger</a>`}
+function illus(){const r=window.LASTRES||{},m=(r.maladies||[])[0];go("img");if(CULT.includes(r.culture))$("i-cult").value=r.culture;$("i-kind").value="symp";
+$("i-p").value=m?(m.nom||"")+((m.symptomes||[]).length?" : "+m.symptomes.slice(0,2).join(", "):""):""}
+
+/* ---- Initialisation ---- */
+$("r-wave").innerHTML=waveBox();$("m-wave").innerHTML=waveBox();
+$("old-data").hidden=!(S.get("users",[]).length||S.get("bk",[]).length);
+{const g=go;go=function(id){if(id==="diag"||id==="voix")eng();if(id!=="compte")START=false;g(id);if(["accueil","compte","admin","froid","machines","carte"].includes(id))refresh();if(id==="villages"||id==="admin")pullVil();if(id==="img")imgGal()}}
+renderRooms();renderM();renderAcc();
+if(sb){
+const hp=new URLSearchParams(location.hash.slice(1));if(hp.get("error_description"))setTimeout(()=>toast("Lien invalide ou expiré. Demandez-en un nouveau."),500);
+sb.auth.onAuthStateChange((ev,ses)=>setTimeout(()=>{const uid=ses?ses.user.id:null,changed=uid!==DB.uid;DB.email=ses?ses.user.email:"";IA_TOKEN=ses?ses.access_token:null;
+if(changed){Object.assign(DB,{uid,me:null,admin:false,loaded:false,err:"",users:[],bk:[],notifs:[],cor:[]});SIG="";if(!uid)S.set("admuid",null);$("r-rec").innerHTML="";$("m-rec").innerHTML="";redraw()}
+if(ev==="PASSWORD_RECOVERY"){AV="newpw";START=false;go("compte");return}
+if(uid)S.set("hasacc",true);
+if(ev==="INITIAL_SESSION"&&!uid){AV=S.get("hasacc",false)||hp.get("error_description")?"login":"register";go("compte");START=true}
+else if(changed&&uid&&START)go("accueil");
+if(changed&&uid)sync(); /* envoie les photos en attente */
+if(changed||ev==="INITIAL_SESSION"||ev==="USER_UPDATED")refresh().then(pullVil)},0));
+setInterval(()=>{if(!document.hidden&&["compte","admin","froid","machines"].some(shown))refresh()},25000);
+addEventListener("online",()=>{refresh();pullVil(true)})}
+</script>
+<script>
+/* ===== GAYNAKO AI VOICE v2 : moteur hybride Ollama + Gemini =====
+   S'active seulement si la fonction « gaynako-assistant » répond ; sinon l'assistant précédent reste utilisé. */
+(()=>{
+const BASE=SB_URL+"/functions/v1/",NAMES={fr:"français",wo:"wolof",srr:"sérère"},oldAsk=ask,oldListen=listen;
+let H2=null,seq=0,rec=null,sr=null,busy=false,last=null,player=new Audio(),parts=[],pi=0,mode="",paused=false,probing=null,probedAt=0;
+const on=()=>!!H2&&CFG.API===IA_URL;
+const STATE={idle:"",listen:"ÉCOUTE",think:"RÉFLEXION",speak:"PAROLE",pause:"EN PAUSE"};
+function state(s){$("v2-orb").dataset.s=s;$("v2-state").textContent=STATE[s];$("mic").classList.toggle("rec",s==="listen");
+$("v2-pau").disabled=!(s==="speak"||s==="pause");$("v2-pau").textContent=s==="pause"?"▶️ Reprendre":"⏸️ Pause";$("v2-rep").disabled=!last}
+const note=t=>{$("v2-info").textContent=t};
+function probe(){if(probing||H2||Date.now()-probedAt<30000)return probing||Promise.resolve();probedAt=Date.now();
+probing=(async()=>{try{const r=await fetch(BASE+"gaynako-assistant",{headers:{apikey:SB_KEY},signal:AbortSignal.timeout(8000)}),j=await r.json();
+if(r.ok&&j.version===2){H2=j;$("v2").hidden=CFG.API!==IA_URL;info();state("idle")}}catch(e){}probing=null})();return probing}
+function info(){if(!H2)return;const l=$("lang").value,e=[H2.ollama&&"Ollama",H2.gemini&&"Gemini"].filter(Boolean).join(" + ")||"aucun moteur configuré";
+note(`Moteurs : ${e}. ${NAMES[l][0].toUpperCase()+NAMES[l].slice(1)} — reconnaissance vocale : ${H2.stt[l]?"disponible":l==="fr"&&(window.SpeechRecognition||window.webkitSpeechRecognition)?"celle du navigateur":"indisponible, écrivez votre question"} ; voix : ${H2.tts[l]?"disponible":l==="fr"?"celle du téléphone":"indisponible, réponse écrite seulement"}.`)}
+async function api(fn,opt={}){const s=sb&&(await sb.auth.getSession()).data.session;if(!s)throw "login";
+let r;try{r=await fetch(BASE+fn,{...opt,headers:{apikey:SB_KEY,Authorization:"Bearer "+s.access_token,...(opt.headers||{})},signal:AbortSignal.timeout(80000)})}
+catch(e){throw navigator.onLine?"Le serveur met trop de temps à répondre.":"Pas de connexion internet."}
+const j=await r.json().catch(()=>({}));if(!r.ok)throw j.error||"Service momentanément indisponible.";return j}
+const post=(fn,b)=>api(fn,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});
+function needLogin(){if(DB.uid)return false;toast("Connectez-vous pour utiliser l’assistant.");go("compte");return true}
+
+/* ---- Parole ---- */
+function hush(){player.onended=player.onerror=null;player.pause();if("speechSynthesis" in window){mode="";speechSynthesis.cancel()}paused=false}
+window.v2Stop=function(){seq++;busy=false;if(rec){rec.cancel=true;rec.stop();rec=null}if(sr){sr.onresult=null;sr.abort();sr=null}hush();state("idle")};
+function done(my){if(my!==seq)return;state("idle");if($("v2-conv").checked&&shown("voix")&&!document.hidden)setTimeout(()=>{if(my===seq&&!rec&&!busy)start()},500)}
+/* Android gère mal pause() sur la voix du navigateur : on lit phrase par phrase et on reprend à la phrase en cours. */
+function sayParts(my){if(my!==seq||paused)return;if(pi>=parts.length)return done(my);
+const u=new SpeechSynthesisUtterance(parts[pi]),v=speechSynthesis.getVoices().find(x=>x.lang.toLowerCase().startsWith("fr"));u.lang="fr-FR";if(v)u.voice=v;
+const at=pi;u.onend=()=>{if(my===seq&&!paused&&mode==="browser"&&at===pi){pi++;sayParts(my)}};u.onerror=e=>{if(my===seq&&!paused&&!/interrupted|canceled/.test(e.error)){state("idle");note("Lecture vocale impossible sur ce téléphone : réponse écrite seulement.")}};
+window.v2U=u;speechSynthesis.speak(u)}
+function playAudio(my){player.onended=()=>done(my);player.onerror=()=>{if(my===seq){state("idle");note("Lecture audio impossible.")}};
+state("speak");player.play().catch(()=>{if(my===seq){paused=true;state("pause");note("Touchez « Reprendre » pour écouter la réponse.")}})}
+async function speak(a){const my=seq;hush();last=a;
+if(H2.tts[a.lang]){if(!a.src){state("think");try{const j=await post("gaynako-text-to-speech",{text:a.text.slice(0,1500),lang:a.lang});if(j.available)a.src="data:"+j.mime+";base64,"+j.audio_b64}catch(e){}if(my!==seq)return}
+if(a.src){mode="server";player.src=a.src;return playAudio(my)}}
+if(a.lang==="fr"&&"speechSynthesis" in window){mode="browser";parts=a.text.match(/[^.!?…]+[.!?…]*/g)||[a.text];pi=0;state("speak");return sayParts(my)}
+state("idle");note("🔇 Synthèse vocale indisponible en "+NAMES[a.lang]+" : la réponse est affichée par écrit seulement.")}
+window.v2Repeat=function(){if(!last)return;v2Stop();speak(last)};
+window.v2Pause=function(){if(!paused){paused=true;if(mode==="browser")speechSynthesis.cancel();else player.pause();state("pause")}
+else{paused=false;if(mode==="browser"){state("speak");sayParts(seq)}else playAudio(seq)}};
+
+/* ---- Question ---- */
+async function send(text){if(busy)return;const my=++seq;busy=true;hush();state("think");note("");
+const hist=CH.slice(-8).filter(m=>!m.err).map(m=>({role:m.r==="u"?"user":"assistant",content:m.t}));const q={r:"u",t:text};CH.push(q);$("q-in").value="";rChat();$("chat-st").textContent="Réponse en cours…";
+try{const j=await post("gaynako-assistant",{message:text,lang:$("lang").value,auto_lang:$("v2-auto").checked,provider:$("v2-prov").value,history:hist,context:aiCtx(window.CTX),save:$("v2-save").checked});
+if(my!==seq)return;window.CTX=null;CH.push({r:"a",t:j.answer,l:j.lang});S.set("chat",CH.slice(-30));rChat();
+$("chat-st").textContent=[j.note,"Moteur : "+({ollama:"Ollama",gemini:"Gemini",cache:"réponse en mémoire"}[j.provider]||j.provider)+" · "+(j.ms/1000).toFixed(1)+" s",$("v2-save").checked&&!j.saved?"Historique non enregistré.":""].filter(Boolean).join(" — ");
+busy=false;if($("v2-hist").open)v2History();await speak({text:j.answer,lang:j.lang})}
+catch(e){if(my!==seq)return;const i=CH.indexOf(q);if(i>=0)CH.splice(i,1);rChat();$("q-in").value=text;state("idle");$("chat-st").textContent="";note(e==="login"?"Connectez-vous à votre compte.":typeof e==="string"?e:"Assistant indisponible.")}
+finally{if(my===seq)busy=false;else{const i=CH.indexOf(q);if(i>=0&&CH[i+1]?.r!=="a"){CH.splice(i,1);rChat()}}}}
+
+/* ---- Écoute ---- */
+function heard(text,check){$("heard").textContent="Vous : "+text;
+if(check){$("q-in").value=text;state("idle");note("Vérifiez le texte reconnu, corrigez-le si besoin, puis touchez « Envoyer ».");$("q-in").focus();return}send(text)}
+function browserSTT(my){const SR=window.SpeechRecognition||window.webkitSpeechRecognition,r=sr=new SR();r.lang="fr-FR";state("listen");let got=false;
+r.onresult=e=>{if(my!==seq)return;got=true;heard(e.results[0][0].transcript,false)};r.onerror=()=>{if(my===seq)note("Micro indisponible, ou rien entendu.")};
+r.onend=()=>{if(sr===r)sr=null;if(my===seq&&!got)state("idle")};try{r.start()}catch(e){state("idle")}}
+async function start(){const lang=$("lang").value,my=++seq;busy=false;hush();note("");
+if(!H2.stt[lang]){if(lang==="fr"&&(window.SpeechRecognition||window.webkitSpeechRecognition))return browserSTT(my);state("idle");return note("🎤 Reconnaissance vocale indisponible en "+NAMES[lang]+" : écrivez votre question.")}
+let st;try{st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}})}catch(e){state("idle");return note("Micro refusé ou indisponible : autorisez-le dans les réglages du navigateur.")}
+if(my!==seq||rec)return st.getTracks().forEach(t=>t.stop());
+let r;try{r=new MediaRecorder(st)}catch(e){st.getTracks().forEach(t=>t.stop());return note("Enregistrement non supporté par ce navigateur.")}
+const ch=[];rec=r;r.ondataavailable=e=>ch.push(e.data);
+/* arrêt automatique après 2 s de silence suivant la parole */
+let ctx,timer,max=setTimeout(()=>r.state==="recording"&&r.stop(),59000);
+try{ctx=new(window.AudioContext||window.webkitAudioContext)();const an=ctx.createAnalyser(),buf=new Uint8Array(an.fftSize=1024);ctx.createMediaStreamSource(st).connect(an);let spoke=0,quiet=Date.now();const t0=quiet;
+timer=setInterval(()=>{an.getByteTimeDomainData(buf);let s=0;for(const v of buf)s+=(v-128)**2;const loud=Math.sqrt(s/buf.length)>6,now=Date.now();if(loud){spoke++;quiet=now}
+if(r.state==="recording"&&((spoke>3&&now-quiet>2000)||(!spoke&&now-t0>10000))){if(!spoke)r.silent=true;r.stop()}},150)}catch(e){}
+r.onstop=async()=>{clearTimeout(max);clearInterval(timer);ctx&&ctx.close();st.getTracks().forEach(t=>t.stop());if(rec===r)rec=null;
+if(r.cancel||my!==seq)return;if(r.silent){state("idle");return note("Je n’ai rien entendu. Touchez le micro pour recommencer.")}
+state("think");try{const wav=await toWav(new Blob(ch,{type:r.mimeType||"audio/webm"})),fd=new FormData();fd.append("audio",wav,"q.wav");fd.append("lang",lang);
+const j=await api("gaynako-speech-to-text",{method:"POST",body:fd});if(my!==seq)return;heard(j.text,j.check)}
+catch(e){if(my!==seq)return;state("idle");note(typeof e==="string"&&e!=="login"?e:"Enregistrement illisible, réessayez.")}};
+r.start();state("listen");note("Parlez. Le micro s’arrête après un silence, ou touchez-le à nouveau.")}
+
+listen=function(){if(!on())return oldListen();if(rec)return rec.stop();if(needLogin())return;
+/* débloque la lecture audio sur Android pendant le geste de l'utilisateur */
+v2Stop();player.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";player.play().catch(()=>{});return start()};
+ask=function(){if(!on())return oldAsk();const t=$("q-in").value.trim();if(!t||needLogin())return;if(t.length>1500)return toast("Question trop longue.");v2Stop();return send(t)};
+const oldSpeakTxt=speakTxt;window.v2ReadLast=function(){if(!on())return oldSpeakTxt((CH.filter(m=>m.r==="a").pop()||{}).t);const m=CH.filter(m=>m.r==="a").pop();if(!m)return toast("Aucune réponse à lire.");v2Stop();speak({text:m.t,lang:m.l||$("lang").value})};
+
+/* ---- Historique ---- */
+window.v2History=async function(){const o=$("v2-hlist");o.textContent="Chargement…";try{const j=await api("gaynako-voice-history?limit=20");
+o.innerHTML=j.items.map(x=>`<div class="warn"><small>${esc(fdate(x.created_at))} · ${esc(NAMES[x.language]||x.language)} · ${esc(x.ai_provider)}</small><br><b>Vous :</b> ${esc(x.user_message)}<br><b>GAYNAKO :</b> ${esc(x.assistant_response)}</div>`).join("")||"Aucune conversation enregistrée."}
+catch(e){o.textContent=e==="login"?"Connectez-vous pour voir votre historique.":String(e)}};
+window.v2Delete=async function(){if(!confirm("Supprimer définitivement tout votre historique ?"))return;try{await api("gaynako-voice-history?all=true",{method:"DELETE"});CH=[];S.set("chat",[]);rChat();v2History()}catch(e){toast("Suppression impossible.")}};
+
+$("v2-save").checked=!!S.get("v2save",false);$("v2-save").onchange=e=>S.set("v2save",e.target.checked);
+$("lang").addEventListener("change",()=>{if(H2){v2Stop();info()}});
+const g=go;go=function(id){if(id!=="voix"&&H2)v2Stop();g(id);if(id==="voix")probe().then(()=>{if(H2){$("v2").hidden=CFG.API!==IA_URL;info()}})};
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&H2)v2Stop()});
+probe();
+})();
+</script>
+<script>
+/* ===== Messages audio enregistrés par des locuteurs natifs (gratuit, sans serveur de voix) ===== */
+(()=>{
+const P=[["accueil","Bonjour et bienvenue sur GAYNAKO AI."],["photo","Prenez une photo nette de la feuille, de la tige ou du fruit."],
+["hypothese","Ce résultat est une hypothèse. Demandez l’avis d’un agent agricole."],["produit","Avant tout traitement, lisez l’étiquette et demandez conseil à un agent agricole."],
+["arrosage","Arrosez de préférence tôt le matin ou en fin d’après-midi."],["recolte","Séchez bien la récolte avant de la stocker, dans un endroit propre et sec."],
+["urgence","En cas de malaise après l’usage d’un produit, allez tout de suite au poste de santé."],["compte","Connectez-vous à votre compte pour poser une question."]];
+const L={wo:"Wolof",srr:"Sérère"},KEY="voix";let pack={},local={},R=null,A=new Audio();
+const okItem=x=>x&&typeof x.a==="string"&&/^data:audio\/[\w.+-]+(;codecs=[\w.,-]+)?;base64,/.test(x.a)&&typeof x.t==="string"&&typeof x.qui==="string"&&x.qui;
+const clean=o=>{const r={};for(const l in L)for(const [k] of P){const x=o&&o[l]&&o[l][k];if(okItem(x))(r[l]=r[l]||{})[k]={t:x.t,a:x.a,qui:x.qui}}return r};
+const get=(l,k)=>(local[l]&&local[l][k])||(pack[l]&&pack[l][k]);
+const count=l=>P.filter(([k])=>get(l,k)).length;
+function list(){const l=$("lang").value,o=$("ph-list");if(!L[l]){$("ph-card").hidden=true;return}$("ph-card").hidden=false;
+o.innerHTML=`<small>${count(l)} message(s) sur ${P.length} enregistré(s) en ${L[l].toLowerCase()}.</small>`+P.map(([k,fr])=>{const x=get(l,k);return x?`<button type="button" class="btn o" onclick="phPlay('${k}')">🔊 ${esc(x.t||fr)}<br><small>${esc(fr)} · voix : ${esc(x.qui)}</small></button>`:""}).join("")}
+window.phPlay=k=>{const x=get($("lang").value,k);if(!x)return;if(window.v2Stop)v2Stop();A.src=x.a;A.play().catch(()=>toast("Lecture audio impossible sur ce téléphone."))};
+function editor(){const l=$("ph-l").value;$("ph-edit").innerHTML=P.map(([k,fr])=>{const x=get(l,k),mine=local[l]&&local[l][k];return `<div class="card" style="margin:8px 0"><b>${esc(fr)}</b><textarea id="ph-t-${k}" rows="2" placeholder="Texte en ${L[l].toLowerCase()}, écrit par le locuteur">${esc(x?x.t:"")}</textarea><button type="button" class="btn s g" id="ph-r-${k}" onclick="phRec('${k}')">🎙️ ${x?"Réenregistrer":"Enregistrer"}</button>${x?`<button type="button" class="btn s o" onclick="phTest('${k}')">▶️ Écouter</button>`:""}${mine?`<button type="button" class="btn s o" onclick="phDel('${k}')">🗑️ Supprimer</button>`:""}</div>`}).join("")}
+const save=async()=>{await pput(KEY,local);editor();list()};
+window.phTest=k=>{A.src=get($("ph-l").value,k).a;A.play().catch(()=>toast("Lecture impossible."))};
+window.phDel=async k=>{const l=$("ph-l").value;delete local[l][k];await save()};
+window.phRec=async k=>{if(R){R.stop();return}const l=$("ph-l").value,qui=$("ph-qui").value.trim(),t=$("ph-t-"+k).value.trim();
+if(!qui)return toast("Indiquez le nom du locuteur.");if(!$("ph-ok").checked)return toast("L’accord du locuteur est requis.");if(!t)return toast("Écrivez d’abord le texte dans la langue.");
+let st;try{st=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){return toast("Micro refusé.")}
+if(R)return st.getTracks().forEach(x=>x.stop());const ch=[],r=R=new MediaRecorder(st,{audioBitsPerSecond:32000}),max=setTimeout(()=>r.state==="recording"&&r.stop(),30000);r.ondataavailable=e=>ch.push(e.data);
+r.onstop=()=>{clearTimeout(max);st.getTracks().forEach(x=>x.stop());R=null;const f=new FileReader();f.onload=async()=>{const x={t,qui,a:f.result};if(!okItem(x))return toast("Enregistrement illisible.");(local[l]=local[l]||{})[k]=x;await save();toast("Enregistré. Écoutez pour vérifier.")};f.readAsDataURL(new Blob(ch,{type:r.mimeType||"audio/webm"}))};
+r.start();$("ph-r-"+k).textContent="⏹️ Arrêter"};
+window.phExport=()=>{const m={};for(const l in L)for(const [k] of P){const x=get(l,k);if(x)(m[l]=m[l]||{})[k]=x}if(!Object.keys(m).length)return toast("Aucun enregistrement.");
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:"application/json"}));a.download="voix.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000)};
+window.phImport=async i=>{const f=i.files[0];i.value="";if(!f)return;try{const m=clean(JSON.parse(await f.text()));if(!Object.keys(m).length)throw 0;for(const l in m)local[l]={...local[l],...m[l]};await save();toast("Enregistrements importés.")}catch(e){toast("Fichier voix.json invalide.")}};
+window.phEditor=editor;
+$("lang").insertAdjacentHTML("afterend",'<div id="ph-card" hidden><h3>🗣️ Messages audio (voix humaine)</h3><div id="ph-list"></div></div>');
+$("adm-body").insertAdjacentHTML("beforeend",`<div class="card" style="margin-top:12px"><h3>🎙️ Voix wolof et sérère</h3><p>Un locuteur natif écrit et enregistre chaque message (30 s maximum), puis une seconde personne le vérifie. Exportez ensuite <b>voix.json</b> et mettez-le en ligne à côté de index.html : tous les utilisateurs l’entendront.</p>
+<select id="ph-l" onchange="phEditor()"><option value="wo">Wolof</option><option value="srr">Sérère</option></select><input id="ph-qui" maxlength="60" placeholder="Nom du locuteur"><label><input type="checkbox" id="ph-ok" style="width:auto"> Le locuteur accepte que sa voix et son nom soient publiés dans l’application</label><div id="ph-edit"></div>
+<button type="button" class="btn g" onclick="phExport()">📥 Exporter voix.json</button><label>Importer un fichier voix.json<input type="file" accept=".json,application/json" onchange="phImport(this)"></label></div>`);
+$("lang").addEventListener("change",list);const sl=setLang;setLang=function(l){sl(l);list()};
+(async()=>{local=clean(await pget(KEY));list();editor();try{const r=await fetch("voix.json",{cache:"no-cache"});if(r.ok){pack=clean(await r.json());list();editor()}}catch(e){}})();
+})();
+</script>
+</body>
+</html>
